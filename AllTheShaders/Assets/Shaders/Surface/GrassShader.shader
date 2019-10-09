@@ -12,7 +12,7 @@
 		_WindColor("Wind Color", Color) = (1,1,1,1)
 		_WindWaveTex("Wind Wave Texture", 2D) = "black" {}
 		_WindChangeAmount("Wind Change Amount", Range(0, 50)) = 1
-		_WindChangeSpeed("Wind Change Speed", Range(0, 10)) = 1
+		_WindChangeSpeed("Wind Change Speed", Range(0, 5)) = 1
 
 		[Header(Grass Blade Movement Options)]
 		_NoiseTex("Noise Texture", 2D) = "black" {}
@@ -55,18 +55,10 @@
 
 		struct Input
 		{
-			//float2 uv_MainTex;
 			float2 uv_NoiseTex;
 			float yVal;
 			float windVal;
 		};
-
-        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-        // #pragma instancing_options assumeuniformscaling
-        UNITY_INSTANCING_BUFFER_START(Props)
-            // put more per-instance properties here
-        UNITY_INSTANCING_BUFFER_END(Props)
 
 		float4 WindDisplacement(appdata_full v, inout Input IN)
 		{
@@ -76,7 +68,7 @@
 			float4 wpos = startwpos;
 
 			//Grass direction wobble
-			float4 uvOffset1 = float4(_Time.x * _WindChangeSpeed, _Time.x * _WindChangeSpeed, 0, 0);
+			float4 uvOffset1 = float4((_Time.x * _WindChangeSpeed) * -normalize(_WindDirection).y, (_Time.x * _WindChangeSpeed) * normalize(_WindDirection).x, 0, 0);
 			IN.windVal = tex2Dlod(_WindWaveTex, float4(startwpos.x * 0.01 * _WindWaveTex_ST.x, startwpos.z * 0.01 * _WindWaveTex_ST.y, 0, 0) + uvOffset1);
 			float tempVal = tex2Dlod(_WindWaveTex, float4(startwpos.x * 0.01 * _WindWaveTex_ST.x, startwpos.z * 0.01 * _WindWaveTex_ST.y, 0, 0) + uvOffset1) - 0.5;
 			tempVal *= IN.yVal * _WindChangeAmount;
@@ -126,13 +118,6 @@
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             fixed4 c = _Color;
-
-			if (IN.windVal > 0.5)
-			{
-				IN.windVal = (IN.windVal - 0.5) * 2;
-				c = lerp(c, _WindColor, IN.windVal);
-			}
-
 			c = lerp(c, c - float4(0.2, 0.2, 0.2, 0), 1 - IN.yVal);
 
 			o.Albedo = c.rgb;

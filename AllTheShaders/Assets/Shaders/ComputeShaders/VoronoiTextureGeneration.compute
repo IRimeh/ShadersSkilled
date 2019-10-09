@@ -1,0 +1,129 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture3D<float4> Result;
+RWStructuredBuffer<float3> points;
+int textureSize;
+int gridSize;
+
+float rand(float2 co) {
+	float val = sin(dot(co.xy, float2(12.9898, 78.233))) * 43758.5453;
+	return val - floor(val);
+}
+
+void GeneratePoints()
+{
+	float stepSize = (float)textureSize / (float)gridSize;
+	for (float i = 0; i < points.Length; i++)
+	{
+		points[i] = float3(rand(float2(i * 1.324134, i * 1.42134)), rand(float2(i * 1.87434, i * 1.543134)), rand(float2(i * 1.97621, i * 1.7324)));
+		points[i] *= stepSize;
+	}
+}
+
+float3 GetPointCoordAtTexcoord(float x, float y, float z)
+{
+	//Get coords in grid space
+	float stepSize = (float)textureSize / (float)gridSize;
+	x = floor((float)x / stepSize);
+	y = floor((float)y / stepSize);
+	z = floor((float)z / stepSize);
+
+	return float3(x, y, z);
+}
+
+void UpdatePointCoords(inout float3 pointCoords, out float3 positionOffset)
+{
+	positionOffset = float3(0, 0, 0);
+	//x
+	if (pointCoords.x < 0)
+	{
+		pointCoords.x += gridSize;
+		positionOffset.x = -textureSize;
+	}
+	else if (pointCoords.x >= gridSize)
+	{
+		pointCoords.x -= gridSize;
+		positionOffset.x = textureSize;
+	}
+	//y
+	if (pointCoords.y < 0)
+	{
+		pointCoords.y += gridSize;
+		positionOffset.y = -textureSize;
+	}
+	else if (pointCoords.y >= gridSize)
+	{
+		pointCoords.y -= gridSize;
+		positionOffset.y = textureSize;
+	}
+	//z
+	if (pointCoords.z < 0)
+	{
+		pointCoords.z += gridSize;
+		positionOffset.z = -textureSize;
+	}
+	else if (pointCoords.z >= gridSize)
+	{
+		pointCoords.z -= gridSize;
+		positionOffset.z = textureSize;
+	}
+}
+
+float GetLowestDistanceOfSurroundingPoints(float3 pointCoords, float3 texCoords)
+{
+	float stepSize = (float)textureSize / (float)gridSize;
+	//Loop through surrounding points
+	float lowestDistance = 99999;
+	for (int x = -1; x < 2; x++)
+	{
+		for (int y = -1; y < 2; y++)
+		{
+			for (int z = -1; z < 2; z++)
+			{
+				float3 currentPointCoords = pointCoords + float3(x, y, z);
+				float3 positionOffset = float3(0, 0, 0);
+				UpdatePointCoords(currentPointCoords, positionOffset);
+				float3 offset = float3(currentPointCoords.x * stepSize, currentPointCoords.y * stepSize, currentPointCoords.z * stepSize);
+				float3 pointPosition = points[currentPointCoords.x + (currentPointCoords.y * gridSize) + (currentPointCoords.z * gridSize * gridSize)] + offset + positionOffset;
+
+				float dist = distance(texCoords, pointPosition);
+				if (dist < lowestDistance)
+				{
+					lowestDistance = dist;
+				}
+			}
+		}
+	}
+
+	return lowestDistance;
+}
+
+void GenerateWorleyTexture()
+{
+	float stepSize = (float)textureSize / (float)gridSize;
+	//Loop through texture
+	for (int x = 0; x < textureSize; x++)
+	{
+		for (int y = 0; y < textureSize; y++)
+		{
+			for (int z = 0; z < textureSize; z++)
+			{
+				float3 pointCoord = GetPointCoordAtTexcoord(x, y, z);
+				float dist = GetLowestDistanceOfSurroundingPoints(pointCoord, float3((float)x, (float)y, (float)z));
+				dist = dist / stepSize;
+
+				Result[float3(x, y, z)] = float4(dist, dist, dist, 1);
+			}
+		}
+	}
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	GeneratePoints();
+	GenerateWorleyTexture();
+}
