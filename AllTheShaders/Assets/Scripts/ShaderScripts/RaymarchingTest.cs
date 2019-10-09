@@ -143,11 +143,9 @@ public class RaymarchingTest : MonoBehaviour
         if(_generateTexture)
         {
             _generateTexture = false;
-            //Texture3D tex = CreateTexture3D(_textureSize, _gridSize);
-            //_generateTexture = false;
-            //_material.SetTexture("_3DNoiseTex", tex);
 
-            int kernelHandle = _computeShader.FindKernel("CSMain");
+            int mainKernel = _computeShader.FindKernel("CSMain");
+            int pointGenerationKernel = _computeShader.FindKernel("PointGenerator");
 
             //Create rendertexture
             RenderTexture tex = new RenderTexture(_textureSize, _textureSize, 0);
@@ -161,28 +159,37 @@ public class RaymarchingTest : MonoBehaviour
             _points = new Vector3[_gridSize * _gridSize * _gridSize];
             _newPoints = new Vector3[_gridSize * _gridSize * _gridSize];
 
-            ComputeBuffer buffer = new ComputeBuffer(_points.Length, 12);
-            buffer.SetData(_points);
-            _computeShader.SetBuffer(kernelHandle, "points", buffer);
+            //Generate points
+            GeneratePoints(pointGenerationKernel);
 
-            _computeShader.SetTexture(kernelHandle, "Result", tex);
-            _computeShader.SetInt("textureSize", _textureSize);
-            _computeShader.SetInt("gridSize", _gridSize);
-            _computeShader.Dispatch(kernelHandle, 8, 8, 1);
-
-            buffer.GetData(_newPoints);
+            //Generate worley noise
+            GenerateWorleyNoise(mainKernel, tex);
             
             _material.SetTexture("_3DNoiseTex", tex);
         }
+    }
 
-        if(_printArray)
-        {
-            _printArray = false;
-            foreach (Vector3 point in _newPoints)
-            {
-                Debug.Log(point);
-            }
-        }
+    private void GeneratePoints(int kernel)
+    {
+        ComputeBuffer buffer = new ComputeBuffer(_points.Length, 12);
+        buffer.SetData(_points);
+        _computeShader.SetBuffer(kernel, "points", buffer);
+        _computeShader.SetInt("textureSize", _textureSize);
+        _computeShader.SetInt("gridSize", _gridSize);
+        _computeShader.Dispatch(kernel, 1, 1, 1);
+
+        buffer.GetData(_newPoints);
+    }
+
+    private void GenerateWorleyNoise(int kernel, RenderTexture texture)
+    {
+        ComputeBuffer buffer = new ComputeBuffer(_newPoints.Length, 12);
+        buffer.SetData(_newPoints);
+        _computeShader.SetBuffer(kernel, "points", buffer);
+        _computeShader.SetTexture(kernel, "Result", texture);
+        _computeShader.SetInt("textureSize", _textureSize);
+        _computeShader.SetInt("gridSize", _gridSize);
+        _computeShader.Dispatch(kernel, 8, 8, 8);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

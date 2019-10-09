@@ -8026,8 +8026,8 @@ MonoBehaviour:
   _material: {fileID: 2100000, guid: e8ea22a3154b567479efb6d13d993234, type: 2}
   _container: {fileID: 1552245429}
   _computeShader: {fileID: 7200000, guid: 960591aadf92df745bd8329a09318950, type: 3}
-  _textureSize: 64
-  _gridSize: 4
+  _textureSize: 128
+  _gridSize: 16
   _generateTexture: 0
   _printArray: 0
 --- !u!1 &1017202531
