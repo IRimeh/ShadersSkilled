@@ -1,6 +1,7 @@
 ﻿RWStructuredBuffer<float3> points;
 int textureSize;
 int gridSize;
+int textureChannel;
 
 float rand(float2 co) {
 	float val = sin(dot(co.xy, float2(12.9898, 78.233))) * 43758.5453;
@@ -16,7 +17,7 @@ void PointGenerator()
 	float stepSize = (float)textureSize / (float)gridSize;
 	for (float i = 0; i < points.Length; i++)
 	{
-		points[i] = float3(rand(float2(i * 1.324134, i * 1.42134)), rand(float2(i * 1.87434, i * 1.543134)), rand(float2(i * 1.97621, i * 1.7324)));
+		points[i] = float3(rand(float2(i * 1.324134 + textureChannel * 7.3245, i * 1.42134 + textureChannel * 4.231123)), rand(float2(i * 1.87434 + textureChannel * 3.6423, i * 1.543134 + textureChannel * 8.2345)), rand(float2(i * 1.97621 + textureChannel * 2.4326, i * 1.7324 + textureChannel * 9.532123)));
 		points[i] *= stepSize;
 	}
 }
@@ -103,6 +104,7 @@ float GetLowestDistanceOfSurroundingPoints(float3 pointCoords, float3 texCoords)
 	return lowestDistance;
 }
 
+//Generate entire texture
 void GenerateWorleyTexture()
 {
 	float stepSize = (float)textureSize / (float)gridSize;
@@ -123,15 +125,32 @@ void GenerateWorleyTexture()
 	}
 }
 
-void GenerateWorleyTextureForPixel(int x, int y, int z)
+//Generate texture for one pixel of texture coordinates
+void GenerateWorleyTextureForPixel(int x, int y, int z, int channel)
 {
 	float stepSize = (float)textureSize / (float)gridSize;
 
 	float3 pointCoord = GetPointCoordAtTexcoord(x, y, z);
 	float dist = GetLowestDistanceOfSurroundingPoints(pointCoord, float3((float)x, (float)y, (float)z));
 	dist = dist / stepSize;
-
-	Result[float3(x, y, z)] = float4(dist, dist, dist, 1);
+	
+	//Write to texture
+	float4 currentColor = Result[float3(x, y, z)];
+	switch (channel)
+	{
+	case 0:
+		Result[float3(x, y, z)] = float4(dist, currentColor.yzw);
+		break;
+	case 1:
+		Result[float3(x, y, z)] = float4(currentColor.x, dist, currentColor.zw);
+		break;
+	case 2: 
+		Result[float3(x, y, z)] = float4(currentColor.xy, dist, currentColor.w);
+		break;
+	case 3: 
+		Result[float3(x, y, z)] = float4(currentColor.xyz, dist);
+		break;
+	}
 }
 
 [numthreads(8, 8, 8)]
@@ -145,7 +164,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 		{
 			for (float z = 0; z < ratio; z++)
 			{
-				GenerateWorleyTextureForPixel(startPoint.x + x, startPoint.y + y, startPoint.z + z);
+				GenerateWorleyTextureForPixel(startPoint.x + x, startPoint.y + y, startPoint.z + z, textureChannel);
 			}
 		}
 	}

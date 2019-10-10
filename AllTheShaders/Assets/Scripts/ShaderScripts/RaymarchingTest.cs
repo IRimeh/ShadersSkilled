@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
@@ -12,14 +13,21 @@ public class RaymarchingTest : MonoBehaviour
     private GameObject _container;
     [SerializeField]
     private ComputeShader _computeShader;
+
+    [Header("Texture Options")]
     [SerializeField]
     private int _textureSize = 256;
     [SerializeField]
-    private int _gridSize = 8;
+    private int _channel0GridSize = 8;
+    [SerializeField]
+    private int _channel1GridSize = 8;
+    [SerializeField]
+    private int _channel2GridSize = 8;
+    [SerializeField]
+    private int _channel3GridSize = 8;
     [SerializeField]
     private bool _generateTexture;
-    [SerializeField]
-    private bool _printArray = false;
+
 
     private Vector3 boundsMin;
     private Vector3 boundsMax;
@@ -29,12 +37,7 @@ public class RaymarchingTest : MonoBehaviour
 
     private Vector3[] _points;
     private Vector3[] _newPoints;
-
-    private void Start()
-    {
-        Texture3D tex = CreateTexture3D(_textureSize, _gridSize);
-        _material.SetTexture("_3DNoiseTex", tex);
-    }
+    private RenderTexture _renderTex;
 
     private void CaluclateContainerBounds()
     {
@@ -43,99 +46,6 @@ public class RaymarchingTest : MonoBehaviour
             boundsMin = _container.transform.position - _container.transform.localScale / 2;
             boundsMax = _container.transform.position + _container.transform.localScale / 2;
         }
-    }
-
-    private void GenerateTexturePoints(int textureSize, int gridSize)
-    {
-        Vector3[,,] tempTexturePoints = new Vector3[gridSize, gridSize, gridSize];
-        float textureStepSize = (float)textureSize / (float)gridSize;
-
-        //Generate points in texture
-        for (int x = 0; x < gridSize; x++)
-        {
-            for (int y = 0; y < gridSize; y++)
-            {
-                for (int z = 0; z < gridSize; z++)
-                {
-                    Vector3 startCoords = new Vector3(x * textureStepSize, y * textureStepSize, z * textureStepSize);
-                    Vector3 randomOffset = new Vector3(Random.Range(0, textureStepSize), Random.Range(0, textureStepSize), Random.Range(0, textureStepSize));
-
-                    tempTexturePoints[x, y, z] = startCoords + randomOffset;
-                    //Debug.Log(tempTexturePoints[x, y, z]);
-                }
-            }
-        }
-
-        //Copy points to make texture wrap seamlessly
-        texturePoints = new Vector3[gridSize * 3, gridSize * 3, gridSize * 3];
-        for (int x = 0; x < 3; x++)
-        {
-            for (int y = 0; y < 3; y++)
-            {
-                for (int z = 0; z < 3; z++)
-                {
-                    int xStartPoint = x * gridSize;
-                    int yStartPoint = y * gridSize;
-                    int zStartPoint = z * gridSize;
-
-                    Vector3 offset = new Vector3((x - 1) * textureSize, (y - 1) * textureSize, (z - 1) * textureSize);
-                    for (int x2 = 0; x2 < gridSize; x2++)
-                    {
-                        for (int y2 = 0; y2 < gridSize; y2++)
-                        {
-                            for (int z2 = 0; z2 < gridSize; z2++)
-                            {
-                                texturePoints[xStartPoint + x2, yStartPoint + y2, zStartPoint + z2] = tempTexturePoints[x2, y2, z2] + offset;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Texture3D CreateTexture3D(int textureSize, int gridSize)
-    {
-        Color[] colorArray = new Color[textureSize * textureSize * textureSize];
-        Texture3D texture = new Texture3D(textureSize, textureSize, textureSize, TextureFormat.RGBA32, true);
-
-        GenerateTexturePoints(textureSize, gridSize);
-
-        float stepSize = textureSize / gridSize;
-        float r = 1.0f / (textureSize - 1.0f);
-        for (int x = 0; x < textureSize; x++)
-        {
-            for (int y = 0; y < textureSize; y++)
-            {
-                for (int z = 0; z < textureSize; z++)
-                {
-                    int xIndex = (int)Mathf.Floor((float)x / stepSize) + gridSize - 1;
-                    int yIndex = (int)Mathf.Floor((float)y / stepSize) + gridSize - 1;
-                    int zIndex = (int)Mathf.Floor((float)z / stepSize) + gridSize - 1;
-
-                    float minDistance = float.MaxValue;
-                    for (int width = xIndex; width < xIndex + 3; width++)
-                    {
-                        for (int height = yIndex; height < yIndex + 3; height++)
-                        {
-                            for (int depth = zIndex; depth < zIndex + 3; depth++)
-                            {
-                                float dist = Vector3.Distance(texturePoints[width, height, depth], new Vector3(x, y, z));
-                                if (dist < minDistance)
-                                    minDistance = dist;
-                            }
-                        }
-                    }
-                    minDistance /= stepSize;
-
-                    Color c = new Color(minDistance, minDistance, minDistance, minDistance);
-                    colorArray[x + (y * textureSize) + (z * textureSize * textureSize)] = c;
-                }
-            }
-        }
-        texture.SetPixels(colorArray);
-        texture.Apply();
-        return texture;
     }
 
     private void OnValidate()
@@ -148,47 +58,59 @@ public class RaymarchingTest : MonoBehaviour
             int pointGenerationKernel = _computeShader.FindKernel("PointGenerator");
 
             //Create rendertexture
-            RenderTexture tex = new RenderTexture(_textureSize, _textureSize, 0);
-            tex.enableRandomWrite = true;
-            tex.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
-            tex.volumeDepth = _textureSize;
-            tex.wrapMode = TextureWrapMode.Repeat;
-            tex.Create();
+            _renderTex = new RenderTexture(_textureSize, _textureSize, 0);
+            _renderTex.enableRandomWrite = true;
+            _renderTex.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
+            _renderTex.volumeDepth = _textureSize;
+            _renderTex.wrapMode = TextureWrapMode.Repeat;
+            _renderTex.Create();
 
-            //Create structuredbuffer
-            _points = new Vector3[_gridSize * _gridSize * _gridSize];
-            _newPoints = new Vector3[_gridSize * _gridSize * _gridSize];
+            //Channel 0 (Red)
+            _points = new Vector3[_channel0GridSize * _channel0GridSize * _channel0GridSize];
+            _newPoints = new Vector3[_channel0GridSize * _channel0GridSize * _channel0GridSize];
+            GeneratePoints(pointGenerationKernel, _textureSize, _channel0GridSize);
+            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel0GridSize, 0);
+            //Channel 1 (Green)
+            _points = new Vector3[_channel1GridSize * _channel1GridSize * _channel1GridSize];
+            _newPoints = new Vector3[_channel1GridSize * _channel1GridSize * _channel1GridSize];
+            GeneratePoints(pointGenerationKernel, _textureSize, _channel1GridSize);
+            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel1GridSize, 1);
+            //Channel 2 (Blue)
+            _points = new Vector3[_channel2GridSize * _channel2GridSize * _channel2GridSize];
+            _newPoints = new Vector3[_channel2GridSize * _channel2GridSize * _channel2GridSize];
+            GeneratePoints(pointGenerationKernel, _textureSize, _channel2GridSize);
+            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel2GridSize, 2);
+            //Channel 3 (Alpha)
+            _points = new Vector3[_channel3GridSize * _channel3GridSize * _channel3GridSize];
+            _newPoints = new Vector3[_channel3GridSize * _channel3GridSize * _channel3GridSize];
+            GeneratePoints(pointGenerationKernel, _textureSize, _channel3GridSize);
+            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel3GridSize, 3);
 
-            //Generate points
-            GeneratePoints(pointGenerationKernel);
-
-            //Generate worley noise
-            GenerateWorleyNoise(mainKernel, tex);
-            
-            _material.SetTexture("_3DNoiseTex", tex);
+            _material.SetTexture("_3DNoiseTex", _renderTex);
         }
     }
 
-    private void GeneratePoints(int kernel)
+    private void GeneratePoints(int kernel, int textureSize, int gridSize)
     {
         ComputeBuffer buffer = new ComputeBuffer(_points.Length, 12);
         buffer.SetData(_points);
         _computeShader.SetBuffer(kernel, "points", buffer);
-        _computeShader.SetInt("textureSize", _textureSize);
-        _computeShader.SetInt("gridSize", _gridSize);
+        _computeShader.SetInt("textureSize", textureSize);
+        _computeShader.SetInt("gridSize", gridSize);
         _computeShader.Dispatch(kernel, 1, 1, 1);
 
         buffer.GetData(_newPoints);
     }
 
-    private void GenerateWorleyNoise(int kernel, RenderTexture texture)
+    private void GenerateWorleyNoise(int kernel, RenderTexture texture, int textureSize, int gridSize, int channel = 0)
     {
         ComputeBuffer buffer = new ComputeBuffer(_newPoints.Length, 12);
         buffer.SetData(_newPoints);
         _computeShader.SetBuffer(kernel, "points", buffer);
         _computeShader.SetTexture(kernel, "Result", texture);
-        _computeShader.SetInt("textureSize", _textureSize);
-        _computeShader.SetInt("gridSize", _gridSize);
+        _computeShader.SetInt("textureSize", textureSize);
+        _computeShader.SetInt("gridSize", gridSize);
+        _computeShader.SetInt("textureChannel", channel);
         _computeShader.Dispatch(kernel, 8, 8, 8);
     }
 
