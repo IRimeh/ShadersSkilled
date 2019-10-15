@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -26,6 +27,8 @@ public class RaymarchingTest : MonoBehaviour
     [SerializeField]
     private int _channel3GridSize = 8;
     [SerializeField]
+    private Vector3Int _dispatchGroupSize = new Vector3Int(1, 1, 1);
+    [SerializeField]
     private bool _generateTexture;
 
 
@@ -52,6 +55,9 @@ public class RaymarchingTest : MonoBehaviour
     {
         if(_generateTexture)
         {
+            DateTime startTime = DateTime.Now;
+            Debug.Log("Starting time: " + startTime.TimeOfDay);
+
             _generateTexture = false;
 
             int mainKernel = _computeShader.FindKernel("CSMain");
@@ -86,6 +92,10 @@ public class RaymarchingTest : MonoBehaviour
             GeneratePoints(pointGenerationKernel, _textureSize, _channel3GridSize);
             GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel3GridSize, 3);
 
+            DateTime endTime = DateTime.Now;
+            Debug.Log("End time: " + endTime.TimeOfDay);
+            Debug.Log("Time elapsed: " + (endTime - startTime).TotalSeconds + " seconds");
+
             _material.SetTexture("_3DNoiseTex", _renderTex);
         }
     }
@@ -111,7 +121,7 @@ public class RaymarchingTest : MonoBehaviour
         _computeShader.SetInt("textureSize", textureSize);
         _computeShader.SetInt("gridSize", gridSize);
         _computeShader.SetInt("textureChannel", channel);
-        _computeShader.Dispatch(kernel, 8, 8, 8);
+        _computeShader.Dispatch(kernel, _dispatchGroupSize.x, _dispatchGroupSize.y, _dispatchGroupSize.z);
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

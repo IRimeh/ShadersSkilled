@@ -9,6 +9,8 @@
 		_ShadowColor("Shadow Color", Color) = (1,1,1,1)
 		_CutOff("Cut-Off Value", Range(0, 0.99)) = 0.5
 		_Density("Density", Range(0, 1)) = 0.1
+		_DensityStepSize("Density Step Size", float) = 0.1
+		_LightStepSize("Light Step Size", float) = 0.25
 
 		[Header(Movement Variables)]
 		_MovementDirection("Movement Direction", Vector) = (1, 1, 0, 0)
@@ -52,6 +54,8 @@
 			float3 _NoiseTiling;
 			float _CutOff;
 			float _Density;
+			float _DensityStepSize;
+			float _LightStepSize;
 
 			//Movement variables
 			float3 _MovementDirection;
@@ -111,57 +115,91 @@
 				return float2(distToBox, distInsideBox);
 			}
 
-			float4 raymarchSampleTex(float3 originPos, float3 viewDir, float distToBox, float distInsideBox)
+			#define LIGHT_STEPS 12
+			float raymarchLight(float3 originPos, float3 direction, float distInsideBox, float3 offset, float3 detailOffset)
 			{
-				viewDir = normalize(viewDir);
-				float3 startPos = originPos + (viewDir * distToBox);
-				float stepSize = 0.05f;
-				int stepsTaken = 0;
-
-				float4 result = 0;
-				for (float i = 0; i < 10; i += stepSize)
+				float light = 0;
+				for (int i = 1; i < LIGHT_STEPS; i++)
 				{
-					stepsTaken++;
-					float3 currentPos = startPos + (viewDir * i);
+					float3 pos = originPos + (direction * (i * _LightStepSize));
 
-					//Time movement offset
-					float3 offset = _MovementDirection * _Time.x * _MovementSpeed * 3;
-					float3 detailOffset = _MovementDirection * _Time.x * _MovementSpeed * 3 * (_DetailMovementSpeed * 5);
+					if (i * _LightStepSize > distInsideBox)
+						break;
 
 					//Sample texture
-					float channel0Sample = tex3D(_3DNoiseTex, currentPos * _Channel0Tiling + offset).r;
-					float channel1Sample = tex3D(_3DNoiseTex, currentPos * _Channel1Tiling + offset).g;
-					float channel2Sample = tex3D(_3DNoiseTex, currentPos * _Channel2Tiling + offset).b;
-					float detailSample = tex3D(_3DNoiseTex, currentPos * _DetailTiling + detailOffset).a;
+					float channel0Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).r;
+					float channel1Sample = tex3D(_3DNoiseTex, pos * _Channel1Tiling + offset).g;
+					float channel2Sample = tex3D(_3DNoiseTex, pos * _Channel2Tiling + offset).b;
+					float detailSample = tex3D(_3DNoiseTex, pos * _DetailTiling + detailOffset).a;
 
-					//Combine samples
+					//Calculate density
 					float totalWeight = _Channel0 + _Channel1 + _Channel2;
 					float weight = (channel0Sample * _Channel0 + channel1Sample * _Channel1 + channel2Sample * _Channel2) / totalWeight;
 					float density = weight - (detailSample * _DetailWeight);
 
-					//Check density
+					if (density >= _CutOff) {
+						light++; //_LightStepSize;//1 / LIGHT_STEPS;
+					}
+				}
+				return light / LIGHT_STEPS;
+			}
+
+			#define STEP_NUM 100
+			#define STEP_SIZE 0.1
+			float4 raymarchClouds(float3 originPos, float3 direction, float distInsideBox)
+			{
+				float alphaVal = 0;
+				float lightVal = 0;
+				float lightSteps = 0;
+
+				//Time movement offset
+				float3 offset = _MovementDirection * _Time.x * _MovementSpeed * 3;
+				float3 detailOffset = _MovementDirection * _Time.x * _MovementSpeed * 3 * (_DetailMovementSpeed * 5);
+
+				[loop]
+				for (float i = 0; i < STEP_NUM; i++)
+				{
+					float ratio = i / STEP_NUM;
+					float3 pos = originPos + (direction * (i * _DensityStepSize));
+
+					//Sample texture
+					float channel0Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).r;
+					float channel1Sample = tex3D(_3DNoiseTex, pos * _Channel1Tiling + offset).g;
+					float channel2Sample = tex3D(_3DNoiseTex, pos * _Channel2Tiling + offset).b;
+					float detailSample = tex3D(_3DNoiseTex, pos * _DetailTiling + detailOffset).a;
+
+					//Calculate density
+					float totalWeight = _Channel0 + _Channel1 + _Channel2;
+					float weight = (channel0Sample * _Channel0 + channel1Sample * _Channel1 + channel2Sample * _Channel2) / totalWeight;
+					float density = weight - (detailSample * _DetailWeight);
+
 					if (density >= _CutOff)
 					{
+						//Calculate cloud density
 						float maxDiff = 1 - _CutOff;
-						float ColorVal01 = (density - _CutOff) / maxDiff;
-						float val = stepSize * _Density * ColorVal01;
-						float height = (currentPos.y - _BoundsMin.y) / (_BoundsMax - _BoundsMin).y;
+						float Density01 = (density - _CutOff) / maxDiff;
+						alphaVal += _DensityStepSize * _Density * 0.5;
 
-						if(height > 0.5)
-							result += lerp(_Color, _LightColor0, height) * val;
-						else
-							result += lerp(_Color, _ShadowColor, ( 1- height)) * val;
-
-						/*return result / val;*/
+						//Calculate cloud color
+						/*if (lightVal == 0)
+						{*/
+						if (lightSteps < 10) {
+							float2 rayBox = rayBoxDist(_BoundsMin, _BoundsMax, pos, -normalize(_WorldSpaceLightPos0));
+							lightVal += (1 - ratio) * (1 - raymarchLight(pos + (-normalize(_WorldSpaceLightPos0) * _LightStepSize), -normalize(_WorldSpaceLightPos0), rayBox.y, offset, detailOffset));
+							lightSteps++;
+						}
+						//}
 					}
 
-					//unroll loop
-					if (i >= distInsideBox)
-						i = 10;
+					//Break loop if outside box
+					if (i * _DensityStepSize > distInsideBox)
+						break;
 				}
 
-				//result /= stepsTaken * (1 - _Density);
-				return saturate(result);
+				lightVal /= lightSteps;
+
+				float3 col = lerp(_ShadowColor.rgb, _Color.rgb * _LightColor0, 1 - clamp(lightVal, 0, 1));
+				return float4(col, clamp(alphaVal, 0, 1));
 			}
 
             fixed4 frag (v2f i) : SV_Target
@@ -180,7 +218,7 @@
 				if (distInsideBox > 0 && distToBox < linearDepth)
 				{
 					//3D tex
-					float4 sampleTexCol = raymarchSampleTex(_WorldSpaceCameraPos, i.viewDir, distToBox, distInsideBox);// averageColFromBox(_WorldSpaceCameraPos, i.viewDir, distToBox, distInsideBox, 1);
+					float4 sampleTexCol = raymarchClouds(_WorldSpaceCameraPos + normalize(i.viewDir) * distToBox, normalize(i.viewDir), distInsideBox); //raymarchSampleTex(_WorldSpaceCameraPos, i.viewDir, distToBox, distInsideBox);
 					col.rgb = lerp(col.rgb, sampleTexCol.rgb, sampleTexCol.a);
 
 
@@ -192,8 +230,8 @@
 						float3 pos = _WorldSpaceCameraPos + (normalize(i.viewDir) * distToBox);
 						float3 offset = _MovementDirection * _Time.x * _MovementSpeed * 3;
 						float channel0Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).r;
-						float channel1Sample = tex3D(_3DNoiseTex, pos * _Channel1Tiling + offset).g;
-						float channel2Sample = tex3D(_3DNoiseTex, pos * _Channel2Tiling + offset).b;
+						float channel1Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).g;
+						float channel2Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).b;
 
 						//Combine samples
 						float totalWeight = _Channel0 + _Channel1 + _Channel2;

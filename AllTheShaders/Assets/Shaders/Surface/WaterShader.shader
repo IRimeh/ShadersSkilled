@@ -160,7 +160,7 @@
 					float yUv = ((newLength - dist) / width) * timeMultiplier;
 					float2 rippleUvs = float2(xUv * _RippleTex_ST.x, yUv * _RippleTex_ST.y);
 					
-					color = lerp(color, float4(1, 1, 1, 1), tex2D(_RippleTex, rippleUvs));
+					color.rgb = lerp(color.rgb, float3(1, 1, 1), tex2D(_RippleTex, rippleUvs));
 				}
 			}
 		}
