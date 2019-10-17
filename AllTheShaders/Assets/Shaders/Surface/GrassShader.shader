@@ -51,7 +51,7 @@
 		//Global
 		float _GrassHeight;
 		float3 _WindDirection;
-		float _WindStrength;
+		float _WindStrength = 0.2;
 
 		struct Input
 		{

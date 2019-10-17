@@ -9,7 +9,7 @@ public class GrassScript : MonoBehaviour
 
     [SerializeField]
     [Range(0, 1)]
-    private float _windStrength = 0.5f;
+    private float _windStrength = 0.13f;
     [SerializeField]
     private float _windDirection = 0;
 
@@ -17,6 +17,8 @@ public class GrassScript : MonoBehaviour
     {
         _renderer = GetComponent<Renderer>();
 
+        Shader.SetGlobalFloat("_WindStrength", _windStrength);
+        Shader.SetGlobalVector("_WindDirection", CalcWindDirection(_windDirection));
         Shader.SetGlobalFloat("_GrassHeight", _renderer.bounds.size.y);
     }
 
