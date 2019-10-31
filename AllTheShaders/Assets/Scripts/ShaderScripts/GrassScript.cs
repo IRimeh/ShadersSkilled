@@ -22,6 +22,13 @@ public class GrassScript : MonoBehaviour
         Shader.SetGlobalFloat("_GrassHeight", _renderer.bounds.size.y);
     }
 
+    private void Start()
+    {
+        Shader.SetGlobalFloat("_WindStrength", _windStrength);
+        Shader.SetGlobalVector("_WindDirection", CalcWindDirection(_windDirection));
+        Shader.SetGlobalFloat("_GrassHeight", _renderer.bounds.size.y);
+    }
+
     private void OnValidate()
     {
         while(_windDirection > 360.0f)

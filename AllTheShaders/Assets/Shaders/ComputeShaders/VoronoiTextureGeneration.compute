@@ -139,13 +139,13 @@ void GenerateWorleyTextureForPixel(int x, int y, int z, int channel)
 	switch (channel)
 	{
 	case 0:
-		Result[float3(x, y, z)] = float4(dist, currentColor.yzw);
+		Result[float3(x, y, z)] = float4(1 - dist, currentColor.yzw);
 		break;
 	case 1:
-		Result[float3(x, y, z)] = float4(currentColor.x, dist, currentColor.zw);
+		Result[float3(x, y, z)] = float4(currentColor.x, 1 - dist, currentColor.zw);
 		break;
 	case 2: 
-		Result[float3(x, y, z)] = float4(currentColor.xy, dist, currentColor.w);
+		Result[float3(x, y, z)] = float4(currentColor.xy, 1 - dist, currentColor.w);
 		break;
 	case 3: 
 		Result[float3(x, y, z)] = float4(currentColor.xyz, dist);

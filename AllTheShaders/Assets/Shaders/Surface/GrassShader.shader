@@ -3,7 +3,6 @@
     Properties
     {
         _Color ("Color", Color) = (1,1,1,1)
-        //_MainTex ("Albedo (RGB)", 2D) = "white" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
 
@@ -52,6 +51,8 @@
 		float _GrassHeight;
 		float3 _WindDirection;
 		float _WindStrength = 0.2;
+		float4 _ObjectPositionsToAvoid[16];
+		int _ObjectNum = 16;
 
 		struct Input
 		{

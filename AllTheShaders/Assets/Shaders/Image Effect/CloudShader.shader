@@ -9,7 +9,10 @@
 		_ShadowColor("Shadow Color", Color) = (1,1,1,1)
 		_CutOff("Cut-Off Value", Range(0, 0.99)) = 0.5
 		_Density("Density", Range(0, 1)) = 0.1
+		[Header(March Variables)]
+		_DensityStepNum("Density Step Num", int) = 100
 		_DensityStepSize("Density Step Size", float) = 0.1
+		_LightStepNum("Light Step Num", int) = 12
 		_LightStepSize("Light Step Size", float) = 0.25
 
 		[Header(Movement Variables)]
@@ -54,7 +57,9 @@
 			float3 _NoiseTiling;
 			float _CutOff;
 			float _Density;
+			float _DensityStepNum;
 			float _DensityStepSize;
+			float _LightStepNum;
 			float _LightStepSize;
 
 			//Movement variables
@@ -115,11 +120,12 @@
 				return float2(distToBox, distInsideBox);
 			}
 
-			#define LIGHT_STEPS 12
 			float raymarchLight(float3 originPos, float3 direction, float distInsideBox, float3 offset, float3 detailOffset)
 			{
 				float light = 0;
-				for (int i = 1; i < LIGHT_STEPS; i++)
+				int i = 1;
+				[loop]
+				while (i < _LightStepNum) 
 				{
 					float3 pos = originPos + (direction * (i * _LightStepSize));
 
@@ -140,8 +146,13 @@
 					if (density >= _CutOff) {
 						light++; //_LightStepSize;//1 / LIGHT_STEPS;
 					}
+					i++;
 				}
-				return light / LIGHT_STEPS;
+				/*for (int i = 1; i < LIGHT_STEPS; i++)
+				{
+					
+				}*/
+				return light / _LightStepNum;
 			}
 
 			#define STEP_NUM 100
@@ -150,14 +161,14 @@
 			{
 				float alphaVal = 0;
 				float lightVal = 0;
-				float lightSteps = 0;
 
 				//Time movement offset
 				float3 offset = _MovementDirection * _Time.x * _MovementSpeed * 3;
 				float3 detailOffset = _MovementDirection * _Time.x * _MovementSpeed * 3 * (_DetailMovementSpeed * 5);
 
+				int i = 0;
 				[loop]
-				for (float i = 0; i < STEP_NUM; i++)
+				while (i < _DensityStepNum)
 				{
 					float ratio = i / STEP_NUM;
 					float3 pos = originPos + (direction * (i * _DensityStepSize));
@@ -176,24 +187,21 @@
 					if (density >= _CutOff)
 					{
 						//Calculate cloud density
-						float maxDiff = 1 - _CutOff;
-						float Density01 = (density - _CutOff) / maxDiff;
-						alphaVal += _DensityStepSize * _Density * 0.5;
+						alphaVal += _DensityStepSize * _Density * density;
 
 						//Calculate cloud light level
-						if (lightSteps < LIGHT_STEPS) {
+						if (lightVal == 0)
+						{
 							float2 rayBox = rayBoxDist(_BoundsMin, _BoundsMax, pos, -normalize(_WorldSpaceLightPos0));
-							lightVal += (1 - ratio) * (1 - raymarchLight(pos + (-normalize(_WorldSpaceLightPos0) * _LightStepSize), -normalize(_WorldSpaceLightPos0), rayBox.y, offset, detailOffset));
-							lightSteps++;
+							lightVal = (1 - ratio) * (1 - raymarchLight(pos + (-normalize(_WorldSpaceLightPos0) * _LightStepSize), -normalize(_WorldSpaceLightPos0), rayBox.y, offset, detailOffset));
 						}
 					}
 
 					//Break loop if outside box
 					if (i * _DensityStepSize > distInsideBox)
 						break;
+					i++;
 				}
-
-				lightVal /= lightSteps;
 
 				float3 col = lerp(_ShadowColor.rgb, _Color.rgb * _LightColor0, 1 - clamp(lightVal, 0, 1));
 				return float4(col, clamp(alphaVal, 0, 1));
@@ -227,8 +235,8 @@
 						float3 pos = _WorldSpaceCameraPos + (normalize(i.viewDir) * distToBox);
 						float3 offset = _MovementDirection * _Time.x * _MovementSpeed * 3;
 						float channel0Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).r;
-						float channel1Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).g;
-						float channel2Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).b;
+						float channel1Sample = tex3D(_3DNoiseTex, pos * _Channel1Tiling + offset).g;
+						float channel2Sample = tex3D(_3DNoiseTex, pos * _Channel2Tiling + offset).b;
 
 						//Combine samples
 						float totalWeight = _Channel0 + _Channel1 + _Channel2;

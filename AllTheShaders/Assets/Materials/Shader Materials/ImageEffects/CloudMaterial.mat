@@ -33,25 +33,27 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Channel0: 1
-    - _Channel1: 0.17
-    - _Channel2: 0.163
-    - _CutOff: 0.584
+    - _Channel1: 0.32
+    - _Channel2: 0.28
+    - _CutOff: 0.48
     - _Debug: 0
     - _Density: 1
-    - _DensityStepSize: 0.1
-    - _DetailMovementSpeed: 1
-    - _DetailWeight: 0.086
-    - _LightStepSize: 0.5
-    - _MovementSpeed: 0.224
+    - _DensityStepNum: 100
+    - _DensityStepSize: 0.2
+    - _DetailMovementSpeed: 1.51
+    - _DetailWeight: 0.02
+    - _LightStepNum: 12
+    - _LightStepSize: 0.25
+    - _MovementSpeed: 0.05
     - _Samples: 1
     - _StepLimit: 10
     - _StepSize: 0.1
     m_Colors:
-    - _Channel0Tiling: {r: 0.02, g: 0.02, b: 0.02, a: 0}
+    - _Channel0Tiling: {r: 0.01, g: 0.01, b: 0.01, a: 0}
     - _Channel1Tiling: {r: 0.01, g: 0.01, b: 0.01, a: 1}
-    - _Channel2Tiling: {r: 0.01, g: 0.001, b: 0.001, a: 1}
+    - _Channel2Tiling: {r: 0.001, g: 0.001, b: 0.001, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DetailTiling: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    - _DetailTiling: {r: 0.05, g: 0.05, b: 0.05, a: 1}
     - _MovementDirection: {r: 1, g: 0, b: 1, a: 0}
     - _NoiseTiling: {r: 0.05, g: 0.05, b: 0.05, a: 0}
-    - _ShadowColor: {r: 0.7208526, g: 0.82990056, b: 0.9150943, a: 1}
+    - _ShadowColor: {r: 0.8326362, g: 0.8905368, b: 0.9339623, a: 1}

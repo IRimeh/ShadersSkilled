@@ -37,13 +37,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Glossiness: 0
-    - _GrassMaxDisplacement: 2.95
+    - _GrassMaxDisplacement: 3
     - _Metallic: 0
-    - _WindChangeAmount: 5.6
-    - _WindChangeSpeed: 1.97
+    - _WindChangeAmount: 6.4
+    - _WindChangeSpeed: 0.63
     - _WindScale: 0.51
     - _WobbleAmount: 0.25
     - _WobbleSpeed: 0.05
     m_Colors:
-    - _Color: {r: 0.5067556, g: 0.7735849, b: 0.16420436, a: 1}
-    - _WindColor: {r: 0.63154995, g: 0.8207547, b: 0.127759, a: 1}
+    - _Color: {r: 0.40790552, g: 0.5660378, b: 0.20558918, a: 1}
+    - _WindColor: {r: 0.56539047, g: 0.754717, b: 0.06051977, a: 1}
