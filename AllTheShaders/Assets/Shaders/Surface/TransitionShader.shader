@@ -44,6 +44,7 @@
 		float2 _TransitionTextureTiling;
 		fixed4 _TransitionColor;
 		fixed4 _TransitionSecondaryColor;
+		fixed4 _TransitionTertiaryColor;
 		float3 _OriginPosition = (0,0,0);
 		float _StartAlpha;
 		float _TransitionRange;
@@ -82,8 +83,11 @@
 					alpha = 1;
 					if (dist > _TransitionRange - _TransitionWidth)
 					{
-						if (tex > perc)
-							col = _TransitionColor;
+						if (tex > perc) 
+						{
+							float val = 1 - (tex - perc) / (1 - perc);
+							col = float4(lerp(_TransitionColor.rgb, _TransitionTertiaryColor.rgb, val), _TransitionColor.a);
+						}
 						else if (tex > perc - 0.3)
 							col = float4(lerp(col.rgb, _TransitionSecondaryColor.rgb, 1 - perc), 1 - perc);
 					}
@@ -102,7 +106,10 @@
 					{
 						perc = 1 - pow(1 - pow((dist - _TransitionRange) / (_TransitionWidth * _TransitionOppositeWidth), max(_Thinning, 1)), max(_Thickening, 1));
 						if (tex > perc)
-							col = _TransitionColor;
+						{
+							float val = 1 - (tex - perc) / (1 - perc);
+							col = float4(lerp(_TransitionColor.rgb, _TransitionTertiaryColor.rgb, val), _TransitionColor.a);
+						}
 						else if (tex > perc - 0.3)
 							col = float4(lerp(col.rgb, _TransitionSecondaryColor.rgb, 1 - perc), 1 - perc);
 					}
@@ -115,7 +122,8 @@
 					{
 						if (tex > perc)
 						{
-							col = _TransitionColor;
+							float val = 1 - (tex - perc) / (1 - perc);
+							col = float4(lerp(_TransitionColor.rgb, _TransitionTertiaryColor.rgb, val), _TransitionColor.a);
 							alpha = 1;
 						}
 						else if (tex > perc - 0.3) 

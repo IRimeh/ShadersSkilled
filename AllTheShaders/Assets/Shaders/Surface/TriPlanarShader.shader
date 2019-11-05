@@ -4,9 +4,9 @@
     {
         _Color ("Color", Color) = (1,1,1,1)
         _MainTex ("Top Texture", 2D) = "white" {}
-		_TopNormal("Top Normal Map", 2D) = "normal" {}
+		_TopNormal("Top Normal Map", 2D) = "bump" {}
 		_SideTex("Side Texture", 2D) = "white" {}
-		_SideNormal("Side Normal Map", 2D) = "normal" {}
+		_SideNormal("Side Normal Map", 2D) = "bump" {}
         _Glossiness ("Smoothness", Range(0,1)) = 0.5
         _Metallic ("Metallic", Range(0,1)) = 0.0
 		_BlendPower("Blend Power", float) = 8

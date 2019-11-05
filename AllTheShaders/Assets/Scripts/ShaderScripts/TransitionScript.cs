@@ -15,6 +15,10 @@ public class TransitionScript : MonoBehaviour
     [SerializeField]
     private Color TransitionSecondaryColor;
     [SerializeField]
+    private bool EnableTertiaryColor = false;
+    [SerializeField]
+    private Color TransitionTertiaryColor;
+    [SerializeField]
     [Range(-1, 20)]
     private float Range = 0;
     [SerializeField]
@@ -30,6 +34,12 @@ public class TransitionScript : MonoBehaviour
     [Range(1, 16)]
     private float ThinningValue = 1;
 
+    [Header("Speeds")]
+    [SerializeField]
+    private float _extendSpeed = 2;
+    [SerializeField]
+    private float _retractSpeed = 3;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -40,6 +50,23 @@ public class TransitionScript : MonoBehaviour
     void Update()
     {
         Shader.SetGlobalVector("_OriginPosition", transform.position);
+
+        if (Input.GetKey(KeyCode.P))
+            Expand();
+        if (Input.GetKey(KeyCode.O))
+            Retract();
+    }
+
+    private void Expand()
+    {
+        Range = Mathf.Lerp(Range, 20, Time.deltaTime * _extendSpeed);
+        Shader.SetGlobalFloat("_TransitionRange", Range);
+    }
+
+    private void Retract()
+    {
+        Range = Mathf.Lerp(Range, -1, Time.deltaTime * _retractSpeed);
+        Shader.SetGlobalFloat("_TransitionRange", Range);
     }
 
     private void OnValidate()
@@ -54,5 +81,9 @@ public class TransitionScript : MonoBehaviour
         Shader.SetGlobalFloat("_Thinning", ThinningValue);
         Shader.SetGlobalColor("_TransitionColor", TransitionColor);
         Shader.SetGlobalColor("_TransitionSecondaryColor", TransitionSecondaryColor);
+        if(EnableTertiaryColor)
+            Shader.SetGlobalColor("_TransitionTertiaryColor", TransitionTertiaryColor);
+        else
+            Shader.SetGlobalColor("_TransitionTertiaryColor", TransitionColor);
     }
 }

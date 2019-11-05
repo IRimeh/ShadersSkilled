@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ToonMaterial
-  m_Shader: {fileID: 4800000, guid: d4002b25c9fdd814c92343d8adcff6e5, type: 3}
+  m_Name: TestGeometryMaterial
+  m_Shader: {fileID: 4800000, guid: d79f2de88e915074d9b3e670d84f1785, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -23,23 +23,12 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _NormalTex:
-        m_Texture: {fileID: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 2800000, guid: e160013016c14fe43b513698cae9a3c6, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Glossiness: 0.77
-    - _InitialShadowIntensity: 0
-    - _LightIntensity: 0.24
-    - _LightingSteps: 4
-    - _Metallic: 0
-    - _OutlineSize: 0.188
-    - _RimSize: 0.34
-    - _SecondaryShadowIntensity: 1
-    - _ShadowIntensity: 0.18
-    - _ShadowSteps: 4
+    - _ExtrusionFactor: 0.66
+    - _NoiseTexScrollSpeed: 0.2
     m_Colors:
-    - _Color: {r: 1, g: 0.16531092, b: 0, a: 1}
-    - _Emission: {r: 0, g: 0, b: 0, a: 0}
-    - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
-    - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 0, b: 0, a: 1}

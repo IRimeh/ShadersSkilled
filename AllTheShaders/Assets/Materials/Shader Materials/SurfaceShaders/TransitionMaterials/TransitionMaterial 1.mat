@@ -34,4 +34,4 @@ Material:
     - _StartAlpha: 1
     - _TransitionRange: 0
     m_Colors:
-    - _Color: {r: 0.18600929, g: 0.7169812, b: 0.5461457, a: 1}
+    - _Color: {r: 0, g: 0.53381616, b: 0.8113208, a: 1}
