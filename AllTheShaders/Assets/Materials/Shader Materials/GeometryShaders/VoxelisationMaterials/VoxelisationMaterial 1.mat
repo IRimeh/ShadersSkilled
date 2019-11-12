@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: VoxelisationMaterial 1
+  m_Shader: {fileID: 4800000, guid: 288b6db91a91c9746903b2248d0c2dac, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2450
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _yGradient:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BottomYPos: 3.2402253
+    - _BottomYPos2: -0.9
+    - _CubeSize: 1
+    - _CutOffHarshity: 10
+    - _DropHeight: 1
+    - _HeightDiff: 3
+    - _LineAlpha: 1
+    - _NormalImpact: 3
+    - _RandomStrength: 0.2
+    - _Stretch: 1
+    - _TimeScale: 1
+    - _TriDistance: 1
+    - _UseTextureColor: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _CubeColor: {r: 1, g: 1, b: 1, a: 1}
+    - _FadeColor: {r: 0, g: 0, b: 1, a: 1}
+    - _LineColor: {r: 1, g: 1, b: 1, a: 1}
