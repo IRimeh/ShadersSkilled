@@ -64,10 +64,7 @@ Shader "Unlit/VoxelisationShader"
 				float3 lightDir : TEXCOORD2;
 				fixed4 col : COLOR;
 				SHADOW_COORDS(1)
-
-				half3 tspace0 : TEXCOORD3; // tangent.x, bitangent.x, normal.x
-				half3 tspace1 : TEXCOORD4; // tangent.y, bitangent.y, normal.y
-				half3 tspace2 : TEXCOORD5; // tangent.z, bitangent.z, normal.z
+				float3x3 tspace : TEXCOORD8;
 			};
 
 			struct g2f
@@ -79,10 +76,7 @@ Shader "Unlit/VoxelisationShader"
 				float alpha : TEXCOORD3;
 				float textureFrag : TEXCOORD7;
 				SHADOW_COORDS(1)
-
-				half3 tspace0 : TEXCOORD4; // tangent.x, bitangent.x, normal.x
-				half3 tspace1 : TEXCOORD5; // tangent.y, bitangent.y, normal.y
-				half3 tspace2 : TEXCOORD6; // tangent.z, bitangent.z, normal.z
+				float3x3 tspace : TEXCOORD8;
 			};
 
 			fixed4 _Color;
@@ -112,9 +106,9 @@ Shader "Unlit/VoxelisationShader"
 				half3 wTangent = UnityObjectToWorldDir(v.tangent.xyz);
 				half tangentSign = v.tangent.w * unity_WorldTransformParams.w;
 				half3 wBitangent = cross(o.normal, wTangent) * tangentSign;
-				o.tspace0 = half3(wTangent.x, wBitangent.x, o.normal.x);
-				o.tspace1 = half3(wTangent.y, wBitangent.y, o.normal.y);
-				o.tspace2 = half3(wTangent.z, wBitangent.z, o.normal.z);
+				o.tspace[0] = float3(wTangent.x, wBitangent.x, o.normal.x);
+				o.tspace[1] = float3(wTangent.y, wBitangent.y, o.normal.y);
+				o.tspace[2] = float3(wTangent.z, wBitangent.z, o.normal.z);
 				return o;
 			}
 
@@ -302,9 +296,9 @@ Shader "Unlit/VoxelisationShader"
 			{
 				g2f o;
 				o.lightDir = IN[0].lightDir;
-				o.tspace0 = IN[0].tspace0;
-				o.tspace1 = IN[0].tspace1;
-				o.tspace2 = IN[0].tspace2;
+				o.tspace[0] = IN[0].tspace[0];
+				o.tspace[1] = IN[0].tspace[1];
+				o.tspace[2] = IN[0].tspace[2];
 				o.alpha = 1;
 
 				float3 normal = (IN[0].normal + IN[1].normal + IN[2].normal) / 3;
@@ -336,20 +330,23 @@ Shader "Unlit/VoxelisationShader"
 
 
 				//Create original mesh
-				for (int i = 0; i < 3; i++)
+				if (1 - pow(saturate(1 - yDiff2), _CutOffHarshity) > 0) 
 				{
-					o.tspace0 = IN[i].tspace0;
-					o.tspace1 = IN[i].tspace1;
-					o.tspace2 = IN[i].tspace2;
-					o.uv = IN[i].uv;
-					o.pos = UnityObjectToClipPos(IN[i].pos);
-					o.normal = mul(unity_ObjectToWorld, IN[i].normal);
-					o.alpha = 1 - pow(saturate(1 - yDiff2), _CutOffHarshity);
-					o.textureFrag = 1;
-					TRANSFER_SHADOW(o)
-					triStream.Append(o);
+					for (int i = 0; i < 3; i++)
+					{
+						o.tspace[0] = IN[i].tspace[0];
+						o.tspace[1] = IN[i].tspace[1];
+						o.tspace[2] = IN[i].tspace[2];
+						o.uv = IN[i].uv;
+						o.pos = UnityObjectToClipPos(IN[i].pos);
+						o.normal = mul(unity_ObjectToWorld, IN[i].normal);
+						o.alpha = 1 - pow(saturate(1 - yDiff2), _CutOffHarshity);
+						o.textureFrag = 1;
+						TRANSFER_SHADOW(o)
+						triStream.Append(o);
+					}
+					triStream.RestartStrip();
 				}
-				triStream.RestartStrip();
 
 				//Create cubes
 				o.alpha = saturate(1 - yDiff2Step);
@@ -362,9 +359,9 @@ Shader "Unlit/VoxelisationShader"
 				//Normal caluclation
 				float3 normal = UnpackNormal(tex2D(_NormalMap, i.uv));
 				float3 worldNormal;
-				worldNormal.x = dot(i.tspace0, normal);
-				worldNormal.y = dot(i.tspace1, normal);
-				worldNormal.z = dot(i.tspace2, normal);
+				worldNormal.x = dot(i.tspace[0], normal);
+				worldNormal.y = dot(i.tspace[1], normal);
+				worldNormal.z = dot(i.tspace[2], normal);
 				worldNormal = mul(unity_ObjectToWorld, worldNormal);
 				i.normal = lerp(i.normal, worldNormal, i.textureFrag);
 
@@ -663,16 +660,19 @@ Shader "Unlit/VoxelisationShader"
 
 
 				//Create original mesh
-				for (int i = 0; i < 3; i++)
+				if (1 - pow(saturate(1 - yDiff2), _CutOffHarshity) > 0)
 				{
-					o.uv = IN[i].uv;
-					o.vertex = UnityObjectToClipPos(IN[i].vertex * step(1, yDiff));
-					o.normal = mul(unity_ObjectToWorld, IN[i].normal);
-					o.alpha = saturate(yDiff2);
-					o.vertex = UnityApplyLinearShadowBias(o.vertex);
-					triStream.Append(o);
+					for (int i = 0; i < 3; i++)
+					{
+						o.uv = IN[i].uv;
+						o.vertex = UnityObjectToClipPos(IN[i].vertex * step(1, yDiff));
+						o.normal = mul(unity_ObjectToWorld, IN[i].normal);
+						o.alpha = saturate(yDiff2);
+						o.vertex = UnityApplyLinearShadowBias(o.vertex);
+						triStream.Append(o);
+					}
+					triStream.RestartStrip();
 				}
-				triStream.RestartStrip();
 
 				//Create cubes
 				o.alpha = saturate(1 - yDiff2Step);

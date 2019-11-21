@@ -35,12 +35,12 @@ Material:
     - _Channel0: 1
     - _Channel1: 0.32
     - _Channel2: 0.28
-    - _CutOff: 0.48
+    - _CutOff: 0.575
     - _Debug: 0
     - _Density: 1
     - _DensityStepNum: 100
     - _DensityStepSize: 0.2
-    - _DetailMovementSpeed: 1.51
+    - _DetailMovementSpeed: 0
     - _DetailWeight: 0.02
     - _LightStepNum: 12
     - _LightStepSize: 0.25
