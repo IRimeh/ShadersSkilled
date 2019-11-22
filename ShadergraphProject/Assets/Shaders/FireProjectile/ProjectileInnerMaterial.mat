@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FireMaterial
-  m_Shader: {fileID: -6465566751694194690, guid: 2e85dbdf82151ec468043f0e92e47a27,
+  m_Name: ProjectileInnerMaterial
+  m_Shader: {fileID: -6465566751694194690, guid: fff8c2eb967105742aaa62ad856312af,
     type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -25,7 +25,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_7D85CDE:
-        m_Texture: {fileID: 2800000, guid: a12055d0cd36f514d82ed7393c01f0c4, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9013a540383e2e2428ff01e3f2f070b7, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_ACA95477:
@@ -33,12 +33,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - Vector1_763F700F: 1
-    - Vector1_83059AD2: 0
-    - Vector1_8E2825D3: 0.03
-    - Vector1_9A6CD433: 0.139
-    - Vector1_9C5E3A5D: 0.5
-    - Vector1_B4679C5: 0.25
+    - Vector1_3A97AD11: 16
+    - Vector1_8E2825D3: 0.1
+    - Vector1_97860344: 20
+    - Vector1_9A6CD433: 0
+    - Vector1_9C5E3A5D: 1
+    - Vector1_B4679C5: 0.1
+    - Vector1_E18BE97B: 1.71
     m_Colors:
-    - Color_358C4657: {r: 0.14, g: 0, b: 0, a: 1}
-    - Color_72A9E646: {r: 23.968628, g: 2.3843138, b: 0, a: 1}
+    - Color_358C4657: {r: 1, g: 0.1102245, b: 0, a: 0}
+    - Color_36CA5FEF: {r: 0.9149316, g: 0.9149316, b: 0.12290125, a: 0}
+    - Color_72A9E646: {r: 1, g: 0.7803585, b: 0, a: 0}
+    - Color_AB17EE20: {r: 1, g: 0.061854076, b: 0, a: 0}

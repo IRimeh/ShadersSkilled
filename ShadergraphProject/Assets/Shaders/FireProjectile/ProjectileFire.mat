@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FireMaterial
+  m_Name: ProjectileFire
   m_Shader: {fileID: -6465566751694194690, guid: 2e85dbdf82151ec468043f0e92e47a27,
     type: 3}
   m_ShaderKeywords: 
@@ -29,7 +29,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_ACA95477:
-        m_Texture: {fileID: 2800000, guid: fc68303bd2b04af47a22211a2216426b, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
