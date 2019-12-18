@@ -1,0 +1,144 @@
+﻿RWStructuredBuffer<float2> points;
+int textureSize;
+int gridSize;
+bool inverted;
+
+float rand(float2 co) {
+	float val = sin(dot(co.xy, float2(12.9898, 78.233))) * 43758.5453;
+	return val - floor(val);
+}
+
+//Point generation kernel
+#pragma kernel PointGenerator
+
+[numthreads(1, 1, 1)]
+void PointGenerator()
+{
+	float stepSize = (float)textureSize / (float)gridSize;
+	for (float i = 0; i < points.Length; i++)
+	{
+		points[i] = float2(rand(float2(i * 1.324134  * 7.3245, i * 1.42134 * 4.231123)), rand(float2(i * 1.87434 * 3.6423, i * 1.543134 * 8.2345)));
+		points[i] *= stepSize;
+	}
+}
+
+//Worley noise kernel
+#pragma kernel CSMain
+RWTexture2D<float4> Result;
+
+float2 GetPointCoordAtTexcoord(float x, float y)
+{
+	//Get coords in grid space
+	float stepSize = (float)textureSize / (float)gridSize;
+	x = floor((float)x / stepSize);
+	y = floor((float)y / stepSize);
+
+	return float2(x, y);
+}
+
+void UpdatePointCoords(inout float2 pointCoords, out float2 positionOffset)
+{
+	positionOffset = float2(0, 0);
+	//x
+	if (pointCoords.x < 0)
+	{
+		pointCoords.x += gridSize;
+		positionOffset.x = -textureSize;
+	}
+	else if (pointCoords.x >= gridSize)
+	{
+		pointCoords.x -= gridSize;
+		positionOffset.x = textureSize;
+	}
+	//y
+	if (pointCoords.y < 0)
+	{
+		pointCoords.y += gridSize;
+		positionOffset.y = -textureSize;
+	}
+	else if (pointCoords.y >= gridSize)
+	{
+		pointCoords.y -= gridSize;
+		positionOffset.y = textureSize;
+	}
+}
+
+float GetLowestDistanceOfSurroundingPoints(float2 pointCoords, float2 texCoords)
+{
+	float stepSize = (float)textureSize / (float)gridSize;
+	//Loop through surrounding points
+	float lowestDistance = 99999;
+	for (int x = -1; x < 2; x++)
+	{
+		for (int y = -1; y < 2; y++)
+		{
+				float2 currentPointCoords = pointCoords + float2(x, y);
+				float2 positionOffset = float2(0, 0);
+				UpdatePointCoords(currentPointCoords, positionOffset);
+				float2 offset = float2(currentPointCoords.x * stepSize, currentPointCoords.y * stepSize);
+				float2 pointPosition = points[currentPointCoords.x + (currentPointCoords.y * gridSize)] + offset + positionOffset;
+
+				float dist = distance(texCoords, pointPosition);
+				if (dist < lowestDistance)
+				{
+					lowestDistance = dist;
+				}
+		}
+	}
+
+	return lowestDistance;
+}
+
+//Generate entire texture
+void GenerateWorleyTexture()
+{
+	float stepSize = (float)textureSize / (float)gridSize;
+	//Loop through texture
+	for (int x = 0; x < textureSize; x++)
+	{
+		for (int y = 0; y < textureSize; y++)
+		{
+			for (int z = 0; z < textureSize; z++)
+			{
+				float2 pointCoord = GetPointCoordAtTexcoord(x, y);
+				float dist = GetLowestDistanceOfSurroundingPoints(pointCoord, float2((float)x, (float)y));
+				dist = dist / stepSize;
+
+				if (inverted)
+					dist = 1 - dist;
+
+				Result[float2(x, y)] = float4(dist, dist, dist, 1);
+			}
+		}
+	}
+}
+
+//Generate texture for one pixel of texture coordinates
+void GenerateWorleyTextureForPixel(int x, int y)
+{
+	float stepSize = (float)textureSize / (float)gridSize;
+
+	float2 pointCoord = GetPointCoordAtTexcoord(x, y);
+	float dist = GetLowestDistanceOfSurroundingPoints(pointCoord, float2((float)x, (float)y));
+	dist = dist / stepSize;
+
+	if (inverted)
+		dist = 1 - dist;
+	
+	//Write to texture
+	Result[float2(x, y)] = float4(dist, dist, dist, 1);
+}
+
+[numthreads(8, 8, 8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	float ratio = (float)textureSize / 8;
+	float3 startPoint = id.xyz * ratio;
+	for (float x = 0; x < ratio; x++)
+	{
+		for (float y = 0; y < ratio; y++)
+		{
+			GenerateWorleyTextureForPixel(startPoint.x + x, startPoint.y + y);
+		}
+	}
+}

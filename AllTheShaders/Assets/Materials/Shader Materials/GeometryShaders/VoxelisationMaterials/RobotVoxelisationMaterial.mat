@@ -36,7 +36,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BottomYPos: -0.12667565
+    - _BottomYPos: 1.2143146
     - _BottomYPos2: -0.9
     - _CubeSize: 1
     - _CutOffHarshity: 10

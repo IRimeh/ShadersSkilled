@@ -35,7 +35,7 @@ Material:
     - _Channel0: 1
     - _Channel1: 0.32
     - _Channel2: 0.28
-    - _CutOff: 0.575
+    - _CutOff: 0.335
     - _Debug: 0
     - _Density: 1
     - _DensityStepNum: 100

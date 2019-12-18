@@ -306,7 +306,7 @@
 
 				//Sample depth
 				float nonLinearDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-				float linearDepth = Linear01Depth(nonLinearDepth) * length(i.viewDir);
+				float linearDepth = Linear01Depth(nonLinearDepth)* length(i.viewDir);
 
 				//Raymarch box
 				float2 rayInfo = rayBoxDist(_BoundsMin, _BoundsMax, _WorldSpaceCameraPos, normalize(i.viewDir));
