@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SkyboxShader
+  m_Shader: {fileID: 4800000, guid: 6c01ce899d67d62489840436ea38621d, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _SunGlowInnerEdge: 0.809
+    - _SunGlowOuterEdge: 0.302
+    - _SunGlowSize: 0.586
+    - _SunRimSize: 0.918
+    - _SunSize: 0.126
+    m_Colors:
+    - _HorizonColor: {r: 1, g: 1, b: 1, a: 1}
+    - _SkyColor: {r: 0.0064079626, g: 0.24374636, b: 0.4528302, a: 1}
+    - _SkyDayColor: {r: 0.4014329, g: 0.6521894, b: 0.8773585, a: 1}
+    - _SkyDayGradient: {r: 0.33481666, g: 0.4528381, b: 0.7169812, a: 1}
+    - _SkyNightColor: {r: 0.00088999845, g: 0.053296316, b: 0.18867922, a: 1}
+    - _SkyNightGradient: {r: 0.010279456, g: 0.01925897, b: 0.066037714, a: 1}
+    - _SkySunsetColor: {r: 1, g: 0.37222314, b: 0, a: 1}
+    - _SkySunsetColorBottom: {r: 0.9150943, g: 0.4395335, b: 0, a: 1}
+    - _SunColor: {r: 24.865364, g: 20.42083, b: 7.928087, a: 1}
+    - _SunGlowColor: {r: 1.9322343, g: 1.8062804, b: 0.84763104, a: 1}

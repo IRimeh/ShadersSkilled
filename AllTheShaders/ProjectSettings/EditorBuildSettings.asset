@@ -5,7 +5,16 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
-    path: Assets/Scenes/GrassTestingScene.unity
+  - enabled: 0
+    path: Assets/Scenes/Testing Scenes/GrassTestingScene.unity
     guid: 1630acdae1b5b554b9f3ba1471c74c93
+  - enabled: 0
+    path: Assets/Scenes/Portfolio Scenes/GrassWaterScene/GrassWaterScene.unity
+    guid: 4aa2acb106cca454396690de5158bfed
+  - enabled: 1
+    path: Assets/Scenes/Portfolio Scenes/SnowScene/SnowScene.unity
+    guid: f8fdb59a501bf7a4f9c65bbd1d27fd83
+  - enabled: 0
+    path: Assets/Scenes/Portfolio Scenes/CaveToonScene/CaveToonScene.unity
+    guid: 10af046e4da59fa408eb154074c44195
   m_configObjects: {}

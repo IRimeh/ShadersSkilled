@@ -32,45 +32,45 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
-        m_Texture: {fileID: 8400000, guid: 96ab78cadade39945a45fa2a705dc494, type: 2}
+        m_Texture: {fileID: 2800000, guid: bfb3ae906abf1764f992f889f51d800d, type: 3}
         m_Scale: {x: 0.05, y: 0.05}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex2:
-        m_Texture: {fileID: 8400000, guid: 96ab78cadade39945a45fa2a705dc494, type: 2}
+        m_Texture: {fileID: 2800000, guid: bfb3ae906abf1764f992f889f51d800d, type: 3}
         m_Scale: {x: 0.05, y: 0.05}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex3:
-        m_Texture: {fileID: 8400000, guid: 96ab78cadade39945a45fa2a705dc494, type: 2}
+        m_Texture: {fileID: 2800000, guid: bfb3ae906abf1764f992f889f51d800d, type: 3}
         m_Scale: {x: 0.25, y: 0.25}
         m_Offset: {x: 0, y: 0}
     - _RipplesTex:
-        m_Texture: {fileID: 8400000, guid: 3a33420c704ab3f4d93899da57c576ce, type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _FogDensity: 0
-    - _Glossiness: 1
+    - _FogDensity: 0.1
+    - _Glossiness: 0.753
     - _Intersection: 1.81
     - _Metallic: 1
     - _RefractionStrength: 0.1
     - _RippleStrength: 1
     - _Tessellation: 1
-    - _VectorLength: 0.156
+    - _VectorLength: 0.166
     - _Wave1Speed: 20
     - _Wave1Weight: 1
     - _Wave2Speed: 10
     - _Wave2Weight: 1
     - _Wave3Speed: 5
     - _Wave3Weight: 0.166
-    - _WaveHeight: 0.5
+    - _WaveHeight: 0.4
     - _WaveSpeed: 12.62
     - _WaveTiling: 0.22
     m_Colors:
-    - _Color: {r: 0.097588114, g: 0.47755992, b: 0.4811321, a: 1}
-    - _FogColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.04810424, g: 0.44339612, b: 0.4151886, a: 1}
+    - _FogColor: {r: 0.6901922, g: 0.8867924, b: 0.7884923, a: 1}
     - _IntersectionColor: {r: 0.6597539, g: 0.6597539, b: 0.6597539, a: 1}
     - _NoiseTex2Tiling: {r: 1, g: 1, b: 1, a: 1}
     - _NoiseTexTiling: {r: 1, g: 1, b: 1, a: 1}
-    - _Wave1Direction: {r: 1, g: 0.5, b: 0, a: 0}
-    - _Wave2Direction: {r: 1, g: 0, b: 0, a: 0}
+    - _Wave1Direction: {r: -1, g: 0.5, b: 0, a: 0}
+    - _Wave2Direction: {r: -1, g: 0, b: 1, a: 0}
     - _Wave3Direction: {r: 1, g: 1, b: 1, a: 1}

@@ -191,21 +191,24 @@
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-			fixed4 c = _Color;
-            o.Albedo = c.rgb;
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = c.a;
+			//float3 viewDir = normalize(mul(unity_ObjectToWorld, IN.vertex) - _WorldSpaceCameraPos);
+			float dotVal = dot(float3(0, -1, 0), _WorldSpaceLightPos0);
+			float day = 1 - clamp(dotVal, 0, 1);	
 
 			//Fog
-			float fog = ColorBelowWater(IN.screenPos, o.Normal);
-
+			float fog = ColorBelowWater(IN.screenPos, o.Normal) * day;
 			o.Emission = fog * _FogColor + (IN.rippleCol * 0.25);
+
+			fixed4 c = _Color;
+			o.Albedo = c.rgb;
+			o.Metallic = _Metallic;
+			o.Smoothness = _Glossiness * day;
+			o.Alpha = c.a;
         }
 
 		void ResetAlpha(Input IN, SurfaceOutputStandard o, inout fixed4 color) 
 		{
-			color.a = lerp(0.5, 1, step(mul(unity_ObjectToWorld, IN.vertex).y, _WorldSpaceCameraPos.y));
+			color.a = lerp(_Color.a * 0.5, _Color.a, step(mul(unity_ObjectToWorld, IN.vertex).y, _WorldSpaceCameraPos.y));
 		}
         ENDCG
     }

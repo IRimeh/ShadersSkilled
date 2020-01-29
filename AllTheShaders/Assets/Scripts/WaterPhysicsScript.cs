@@ -30,7 +30,7 @@ public class WaterPhysicsScript : MonoBehaviour
                 else
                     rb.velocity += new Vector3(0, _WaterStrength * Time.fixedDeltaTime, 0);
             }
-            if (Mathf.Abs(dist) < 0.001f && rb.velocity.y < 0.001)
+            if (Mathf.Abs(dist) < 0.001f && rb.velocity.y < 0.001 && rb.velocity.y > 0.001)
             {
                 rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
                 rb.useGravity = false;

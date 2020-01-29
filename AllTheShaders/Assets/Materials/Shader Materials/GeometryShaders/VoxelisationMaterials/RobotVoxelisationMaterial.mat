@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: RobotVoxelisationMaterial
   m_Shader: {fileID: 4800000, guid: 288b6db91a91c9746903b2248d0c2dac, type: 3}
-  m_ShaderKeywords: _USETEXTURECOLOR_ON
+  m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -36,19 +36,19 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BottomYPos: 1.2143146
+    - _BottomYPos: 1.55
     - _BottomYPos2: -0.9
-    - _CubeSize: 1
+    - _CubeSize: 0.29
     - _CutOffHarshity: 10
     - _DropHeight: 0
     - _HeightDiff: 3
     - _LineAlpha: 1
     - _NormalImpact: 3
     - _RandomStrength: 0.12
-    - _Stretch: 0.4
+    - _Stretch: 1
     - _TimeScale: 1
     - _TriDistance: 1
-    - _UseTextureColor: 1
+    - _UseTextureColor: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _CubeColor: {r: 1, g: 1, b: 1, a: 1}

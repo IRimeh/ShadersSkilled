@@ -318,7 +318,7 @@
 					float3 startPos = _WorldSpaceCameraPos + (normalize(i.viewDir) * distToBox);
 					float4 fog = raymarchFog(startPos, normalize(i.viewDir), distInsideBox, linearDepth - distToBox);
 
-					col.rgb = lerp(col.rgb, fog, fog.a);
+					col.rgb = lerp(col.rgb, fog, min(fog.a, 1 - Linear01Depth(nonLinearDepth)));
 				}
 
 				return col;

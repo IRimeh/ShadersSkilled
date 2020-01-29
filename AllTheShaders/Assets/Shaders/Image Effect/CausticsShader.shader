@@ -3,8 +3,9 @@
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+		_CausticAmount("Caustic Amount", Range(0, 1)) = 0.9
 		_CausticsColor("Caustics Color", Color) = (1,1,1,1)
-		_CausticsStrength("Caustics Strength", Range(0, 2)) = 0.1
+		_CausticsStrength("Caustics Strength", Range(-2, 2)) = 0.1
 		_CausticsFallOffDist("Caustics Fall Off Distance", float) = 10
 
 		[Header(Waves)]
@@ -49,6 +50,7 @@
 			float2 _planeExtents;
 			float4x4 _viewToWorld;
 			fixed4 _CausticsColor;
+			float _CausticAmount;
 			float _CausticsStrength;
 			float _CausticsFallOffDist;
 
@@ -161,7 +163,7 @@
 				//Combine everything
 				float fallOff = 1 - clamp(((abs(wsPos.y - (_planePosition.y + yOffset))) / _CausticsFallOffDist), 0, 1);
 				float occlusion = collision * inShadow * yCollision;
-				float caustics = smoothstep(0.25, 1, VertexDisplacement(collisionPoint.xz + waveNormal.xz * _CausticsStrength));
+				float caustics = smoothstep(1 - _CausticAmount, 1, VertexDisplacement(collisionPoint.xz + waveNormal.xz * _CausticsStrength));
 
 				fixed4 col = tex2D(_MainTex, i.uv);
 				return lerp(col, _CausticsColor, caustics * occlusion * fallOff);

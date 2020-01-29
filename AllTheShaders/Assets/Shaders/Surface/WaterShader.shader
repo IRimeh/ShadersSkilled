@@ -69,7 +69,7 @@
 		{
 			float2 uvs = scrPos.xy / scrPos.w;
 			float backgroundDepth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uvs));
-			float surfaceDepth = UNITY_Z_0_FAR_FROM_CLIPSPACE(scrPos.z);
+			float surfaceDepth = scrPos.w;
 
 			return (backgroundDepth - surfaceDepth) * 0.1;
 		}
@@ -106,15 +106,9 @@
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-			fixed4 c = float4(0,0,0,0);
-            o.Albedo = c.rgb;
-            o.Metallic = _Metallic;
-            o.Smoothness = _Glossiness;
-            o.Alpha = 1;
-        }
+			fixed4 color = float4(0, 0, 0, 0);
 
-		void finalColor(Input IN, SurfaceOutputStandard o, inout fixed4 color)
-		{
+
 			//Sample depth texture
 			float depth = UnderWaterDepth(IN.screenPos);
 
@@ -159,10 +153,20 @@
 					float xUv = GetAngle(IN.wpos.xz - _ripples[i].xy, _ripples[i].xy);
 					float yUv = ((newLength - dist) / width) * timeMultiplier;
 					float2 rippleUvs = float2(xUv * _RippleTex_ST.x, yUv * _RippleTex_ST.y);
-					
+
 					color.rgb = lerp(color.rgb, float3(1, 1, 1), tex2D(_RippleTex, rippleUvs));
 				}
 			}
+
+            o.Albedo = color.rgb;
+            o.Metallic = _Metallic;
+            o.Smoothness = _Glossiness;
+            o.Alpha = 1;
+        }
+
+		void finalColor(Input IN, SurfaceOutputStandard o, inout fixed4 color)
+		{
+			
 		}
         ENDCG
     }

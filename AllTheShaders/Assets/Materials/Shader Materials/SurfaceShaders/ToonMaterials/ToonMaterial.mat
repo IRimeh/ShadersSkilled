@@ -24,22 +24,23 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: fcdae6b25ef67fc488a45abfe054af61, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Glossiness: 0.77
-    - _InitialShadowIntensity: 0
+    - _InitialShadowIntensity: 0.4
     - _LightIntensity: 0.24
-    - _LightingSteps: 4
+    - _LightingSteps: 2
     - _Metallic: 0
-    - _OutlineSize: 0.188
+    - _OutlineSize: 0
     - _RimSize: 0.34
     - _SecondaryShadowIntensity: 1
-    - _ShadowIntensity: 0.18
-    - _ShadowSteps: 4
+    - _ShadowIntensity: 1
+    - _ShadowSteps: 2
     m_Colors:
-    - _Color: {r: 1, g: 0.16531092, b: 0, a: 1}
+    - _Color: {r: 0.17288181, g: 0.3301887, b: 0.31493267, a: 1}
     - _Emission: {r: 0, g: 0, b: 0, a: 0}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _RimColor: {r: 1, g: 1, b: 1, a: 1}
+    - _ShadowColor: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}

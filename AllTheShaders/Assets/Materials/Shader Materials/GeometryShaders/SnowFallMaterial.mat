@@ -36,13 +36,13 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _DropHeight: 0.3
-    - _DropWidth: 0.3
-    - _DropletCount: 34
+    - _DropHeight: 2
+    - _DropWidth: 2
+    - _DropletCount: 0.7
     - _HighlightDensity: 0.5
     - _HighlightIntensity: 0.5
     - _NoiseSpeed: 0.304
-    - _NoiseStrength: 1.8
+    - _NoiseStrength: 0.5
     - _RainDropDistance: 50
-    - _RainSpeed: 0.02
+    - _RainSpeed: 0.057
     m_Colors: []

@@ -28,7 +28,7 @@
 			LOD 100
 			Cull Off
 			Blend SrcAlpha OneMinusSrcAlpha
-				ZTest Always
+			ZWrite Off
 
 			Pass
 			{
@@ -73,7 +73,7 @@
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
 				float4 wpos : TEXCOORD1;
-				float4 screenPos : TEXCOORD2;
+				//float4 screenPos : TEXCOORD2;
             };
 
 			struct g2f
@@ -81,7 +81,7 @@
 				float2 uv : TEXCOORD0;
 				float4 vertex : SV_POSITION;
 				float4 wpos : TEXCOORD1;
-				float4 screenPos : TEXCOORD2;
+				//float4 screenPos : TEXCOORD2;
 			};
 
 			float rand(float2 n) 
@@ -97,7 +97,7 @@
 				o.vertex = v.vertex;
                 o.uv = TRANSFORM_TEX(v.uv, _NoiseTex);
 				o.wpos = mul(unity_ObjectToWorld, v.vertex);
-				o.screenPos = ComputeScreenPos(v.vertex);
+				//o.screenPos = ComputeScreenPos(v.vertex);
                 return o;
             }
 
@@ -130,7 +130,7 @@
 
 					float4 tempPos = pos + mul(unity_WorldToObject, offset * maxDist);
 					float depthVal = 1 - tex2Dlod(_DepthTexture, float4(1 - uvs.xy,0,0)).r;
-					float distanceVal = _RainDropDistance;// *depthVal;
+					float distanceVal = _RainDropDistance;
 					float noiseVal = tex2Dlod(_NoiseTex, float4(centerWpos.xz + offset.xz, 0, 0)) * 3;
 
 					//Caluclate time
@@ -153,19 +153,16 @@
 						o.uv = float2(0, 0);
 						o.vertex = UnityObjectToClipPos(pos) + float4(_DropWidth * -0.5, _DropHeight, 0, 0);
 						o.wpos = mul(unity_ObjectToWorld, pos) + float4(_DropWidth * -0.5, _DropHeight, 0, 0);
-						o.screenPos = ComputeScreenPos(UnityObjectToClipPos(pos) + float4(_DropWidth * -0.5, _DropHeight, 0, 0));
 						triStream.Append(o);
 
 						o.uv = float2(0, 1);
 						o.vertex = UnityObjectToClipPos(pos) + float4(_DropWidth * -0.5, -_DropHeight, 0, 0);
 						o.wpos = mul(unity_ObjectToWorld, pos) + float4(_DropWidth * -0.5, -_DropHeight, 0, 0);
-						o.screenPos = ComputeScreenPos(UnityObjectToClipPos(pos) + float4(_DropWidth * -0.5, -_DropHeight, 0, 0));
 						triStream.Append(o);
 
 						o.uv = float2(1, 0);
 						o.vertex = UnityObjectToClipPos(pos) + float4(_DropWidth * 0.5, _DropHeight, 0, 0);
 						o.wpos = mul(unity_ObjectToWorld, pos) + float4(_DropWidth * 0.5, _DropHeight, 0, 0);
-						o.screenPos = ComputeScreenPos(UnityObjectToClipPos(pos) + float4(_DropWidth * 0.5, _DropHeight, 0, 0));
 						triStream.Append(o);
 						triStream.RestartStrip();
 
@@ -174,19 +171,16 @@
 						o.uv = float2(0, 1);
 						o.vertex = UnityObjectToClipPos(pos) + float4(_DropWidth * -0.5, -_DropHeight, 0, 0);
 						o.wpos = mul(unity_ObjectToWorld, pos) + float4(_DropWidth * -0.5, -_DropHeight, 0, 0);
-						o.screenPos = ComputeScreenPos(UnityObjectToClipPos(pos) + float4(_DropWidth * -0.5, -_DropHeight, 0, 0));
 						triStream.Append(o);
 
 						o.uv = float2(1, 1);
 						o.vertex = UnityObjectToClipPos(pos) + float4(_DropWidth * 0.5, -_DropHeight, 0, 0);
 						o.wpos = mul(unity_ObjectToWorld, pos) + float4(_DropWidth * 0.5, -_DropHeight, 0, 0);
-						o.screenPos = ComputeScreenPos(UnityObjectToClipPos(pos) + float4(_DropWidth * 0.5, -_DropHeight, 0, 0));
 						triStream.Append(o);
 
 						o.uv = float2(1, 0);
 						o.vertex = UnityObjectToClipPos(pos) + float4(_DropWidth * 0.5, _DropHeight, 0, 0);
 						o.wpos = mul(unity_ObjectToWorld, pos) + float4(_DropWidth * 0.5, _DropHeight, 0, 0);
-						o.screenPos = ComputeScreenPos(UnityObjectToClipPos(pos) + float4(_DropWidth * 0.5, _DropHeight, 0, 0));
 						triStream.Append(o);
 						triStream.RestartStrip();
 					}
@@ -196,15 +190,17 @@
 			fixed4 frag(g2f i) : SV_Target
 			{
 				float texVal = tex2D(_DropMask, i.uv);
-				float dist = distance(i.wpos.xyz, _WorldSpaceCameraPos.xyz);
+				//float dist = distance(i.wpos.xyz, _WorldSpaceCameraPos.xyz);
+				//float2 uvs = i.screenPos.xy;
 
-				float dist2 = tex2D(_CameraDepthTexture, ComputeScreenPos(i.vertex)).r;
+				//float4 scrPos = ComputeScreenPos(i.vertex);
+				//float4 dist2 = tex2D(_CameraDepthTexture, uvs).r;
 
-				float occlusion = step(dist2, dist);
+				//float occlusion = step(dist2, dist);
 
 
-				fixed4 col = float4(1, 1, 1, 0.8) * texVal * occlusion;
-				return col;// float4(dist2, dist2, dist2, 1);
+			fixed4 col = /*float4(uvs.x, 0, 0, 1);*/ float4(1, 1, 1, 0.8) * texVal;// *occlusion;
+				return col;
             }
             ENDCG
         }

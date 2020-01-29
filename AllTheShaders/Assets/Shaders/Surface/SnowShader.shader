@@ -21,6 +21,8 @@
 
 		_BlurStepAmount("Blur Step Amount", Range(0, 10)) = 6
 		_BlurStepSize("Blur Step Size", float) = 0.002
+
+		_VectorLength("Vector Length (norm calc)", float) = 0.01
     }
     SubShader
     {
@@ -48,6 +50,8 @@
 		float _BlurStepAmount;
 		float _BlurStepSize;
 
+		float _VectorLength;
+
 		struct appdata
 		{
 			float4 vertex : POSITION;
@@ -56,20 +60,21 @@
 			float4 texcoord : TEXCOORD0;
 
 			// we will use this to pass custom data to the surface function
-			fixed4 color : COLOR;
+			fixed4 color : COLOR0;
 		};
 
         struct Input
         {
             float2 uv_MainTex;
 			float4 color : COLOR;
+			float3 normal : NORMAL;
         };
 
 		float4 tessFixed(appdata v0, appdata v1, appdata v2)
 		{
 			float tess = _DefaultTess;
-			float boxSize = 16;
-			float stepSize = 0.01;
+			float boxSize = 8;
+			float stepSize = 0.02;
 
 			//Check if drawn on the depth map close to the vertex
 			for (float i = 0; i < boxSize; i++)
@@ -88,53 +93,71 @@
 			return tess;
 		}
 
-		void vert(inout appdata v)
+		float CalculateSnowHeight(float2 uvs, out float depth)
 		{
 			float halfMax = _MaxDepth * 0.5;
 			float noiseDepth = halfMax * _NoiseDepth;
 
-			//Blur on reading of depth tex
-			float boxSize = _BlurStepAmount;
-			float stepSize = _BlurStepSize;
-			float depth = 0;
+			//float depth = 0;
 			float noise = 0;
 
-			for (float i = 0; i < boxSize; i++)
+			for (float i = 0; i < _BlurStepAmount; i++)
 			{
-				for (float j = 0; j < boxSize; j++)
+				for (float j = 0; j < _BlurStepAmount; j++)
 				{
-					//Calculate depth around vertex
-					float depthVal = tex2Dlod(_SnowDepthTex, float4(float2(1 - v.texcoord.x + ((i - (boxSize / 2)) * stepSize), v.texcoord.y + ((j - (boxSize / 2)) * stepSize)), v.texcoord.zw)).r;					
-					depth += depthVal;
-					
-					float noiseVal = tex2Dlod(_NoiseTex, float4(float2(v.texcoord.x + ((i - (boxSize / 2)) * stepSize), v.texcoord.y + ((j - (boxSize / 2)) * stepSize)) * _NoiseTiling, v.texcoord.zw)) * noiseDepth;
-					noiseVal += tex2Dlod(_NoiseTex, float4(float2(v.texcoord.x + ((i - (boxSize / 2)) * stepSize), v.texcoord.y + ((j - (boxSize / 2)) * stepSize)) * _SecondNoiseTiling, v.texcoord.zw)) * _SecondNoiseDepth;
+					float xStep = (i - (_BlurStepAmount / 2)) * _BlurStepSize;
+					float yStep = (j - (_BlurStepAmount / 2)) * _BlurStepSize;
 
+					//Sample depth texture
+					float depthVal = tex2Dlod(_SnowDepthTex, float4(1 - uvs.x + xStep, uvs.y + yStep, 0, 0)).r;
+					depth += depthVal;
+
+					//Sample noise texture
+					float firstNoiseVal = tex2Dlod(_NoiseTex, float4(float2(uvs.x + xStep, uvs.y + yStep) * _NoiseTiling, 0, 0)).r;
+					float secondNoiseVal = tex2Dlod(_NoiseTex, float4(float2(uvs.x + xStep, uvs.y + yStep) * _SecondNoiseTiling, 0, 0)).r;
+					float noiseVal = (firstNoiseVal * noiseDepth) + (secondNoiseVal * _SecondNoiseDepth);
+
+					//Add noise if nothing touched the snow yet
 					if (abs(depthVal < 0.001))
 						noise += noiseVal;
 				}
 			}
-			depth /= (boxSize * boxSize);
-			noise /= (boxSize * boxSize);
 
+			//Divide by amount of samples taken
+			depth /= (_BlurStepAmount * _BlurStepAmount);
+			noise /= (_BlurStepAmount * _BlurStepAmount);
 			depth -= noise;
 
-			//Vertex displacement based on depth
-			float addedHeight = (_MaxDepth * (1 - depth));
-			v.vertex.y += addedHeight;
+			return _MaxDepth * (1 - depth);
+		}
+
+		void vert(inout appdata v)
+		{
+			float depth;
+
+			float4 v0 = v.vertex;
+			float4 v1 = v0 + mul(unity_WorldToObject, float4(_VectorLength, 0.0, 0.0, 0.0));
+			float4 v2 = v0 + mul(unity_WorldToObject, float4(0.0, 0.0, _VectorLength, 0.0));
+
+			v0.y += CalculateSnowHeight(v.texcoord.xy, depth);
+			v1.y += CalculateSnowHeight(v.texcoord.xy + float2(0.01, 0), depth);
+			v2.y += CalculateSnowHeight(v.texcoord.xy + float2(0, 0.01), depth);
+
+			float3 norm = cross(v2.xyz - v0.xyz, v1.xyz - v0.xyz);
+			v.normal = normalize(norm);
+
+			v.vertex.y += v0.y;
 
 			//Pass depth to surf
-			v.color.r = depth;
+			v.color.g = depth;
 		}
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
-			float depth = IN.color.r;
-			float noise = tex2D(_NoiseTex, IN.uv_MainTex * 100);
+			float depth = IN.color.g;
 
 			//Change color depending on noise and depth
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-			c = lerp(float4(c.rgb, 1), float4(_TrampledSnowColor.rgb, 1), noise * 0.5);
 
 			o.Albedo = lerp(float4(c.rgb, 1), float4(_TrampledSnowColor.rgb,1), depth).rgb;
             o.Metallic = _Metallic;

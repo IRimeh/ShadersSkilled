@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Light))]
 public class LightshaftSettings : MonoBehaviour
 {
     [SerializeField]
-    [Range(0, 2)]
+    [Range(0, 20)]
     private float _intensity = 0.25f;
     [SerializeField]
     private bool _enableGrain;
@@ -16,6 +15,11 @@ public class LightshaftSettings : MonoBehaviour
     public float GetIntensity()
     {
         return _intensity;
+    }
+
+    private void Update()
+    {
+        
     }
 
     public bool IsGrainEnabled()

@@ -5,7 +5,7 @@
 
 		_FogColor("Fog Color", Color) = (1,1,1,1)
 		_FogLength("Fog Density", Range(0.01, 1)) = 0.01
-		_FadeLength("Fade Distance", Range(0, 1)) = 0.5
+		_FadeDistance("Fade Distance 2 the sequal", float) = 30
 	}
 		SubShader
 	{
@@ -32,7 +32,6 @@
 			{
 				float4 vertex : SV_POSITION;
 				float2 uv : TEXCOORD0;
-				float3 dist :TEXCOORD1;
 				float4 screenPos : TEXCOORD2;
 				float3 wpos : TEXCOORD3;
 			};
@@ -41,7 +40,7 @@
 			float4 _CameraDepthTexture_ST;
 			fixed4 _FogColor;
 			float _FogLength;
-			float _FadeLength;
+			float _FadeDistance;
 
 			v2f vert(appdata v)
 			{
@@ -49,7 +48,6 @@
 
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _CameraDepthTexture);
-				o.dist = UnityObjectToViewPos(v.vertex);
 				o.screenPos = ComputeScreenPos(o.vertex);
 				o.wpos =  mul(unity_ObjectToWorld, v.vertex).xyz;
 
@@ -60,14 +58,11 @@
 			{
 				float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture, i.screenPos)) * 0.1 * _FogLength;
 
-				float dist = distance(i.wpos, _WorldSpaceCameraPos);
+				float dist = i.screenPos.w;
 				float newDepth = saturate(depth - (dist * 0.1 * _FogLength));
-				float partZ = length(i.dist);
-
-				float clampedPartZ = clamp((partZ * ((1 - _FadeLength) * 0.5)), 0, 1);
+				float clampedPartZ = saturate((dist - 5.0f) / _FadeDistance);
 
 				newDepth = newDepth * clampedPartZ;
-
 				return float4(_FogColor.xyz, min(newDepth, 1));
 			}
 			ENDCG

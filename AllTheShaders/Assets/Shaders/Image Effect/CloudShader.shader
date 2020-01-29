@@ -9,6 +9,11 @@
 		_ShadowColor("Shadow Color", Color) = (1,1,1,1)
 		_CutOff("Cut-Off Value", Range(0, 0.99)) = 0.5
 		_Density("Density", Range(0, 1)) = 0.1
+
+		[Header(Fade)]
+		_FadeStartDist("Fade Start Distance", float) = 100
+		_FadeDist("Fade Distance", float) = 100
+
 		[Header(March Variables)]
 		_DensityStepNum("Density Step Num", int) = 100
 		_DensityStepSize("Density Step Size", float) = 0.1
@@ -61,6 +66,10 @@
 			float _DensityStepSize;
 			float _LightStepNum;
 			float _LightStepSize;
+
+			//Fade
+			float _FadeStartDist;
+			float _FadeDist;
 
 			//Movement variables
 			float3 _MovementDirection;
@@ -148,11 +157,7 @@
 					}
 					i++;
 				}
-				/*for (int i = 1; i < LIGHT_STEPS; i++)
-				{
-					
-				}*/
-				return light / _LightStepNum;
+				return light / (float)i;
 			}
 
 			#define STEP_NUM 100
@@ -171,7 +176,8 @@
 				while (i < _DensityStepNum)
 				{
 					float ratio = i / STEP_NUM;
-					float3 pos = originPos + (direction * (i * _DensityStepSize));
+					float stepsize = max(_DensityStepSize, distInsideBox / STEP_NUM);
+					float3 pos = originPos + (direction * (i * stepsize));
 
 					//Sample texture
 					float channel0Sample = tex3D(_3DNoiseTex, pos * _Channel0Tiling + offset).r;
@@ -182,10 +188,12 @@
 					//Calculate density
 					float totalWeight = _Channel0 + _Channel1 + _Channel2;
 					float weight = (channel0Sample * _Channel0 + channel1Sample * _Channel1 + channel2Sample * _Channel2) / totalWeight;
-					float density = weight - (detailSample * _DetailWeight);
+					float density = smoothstep(0, 0.5, weight - (detailSample * _DetailWeight));
 
 					if (density >= _CutOff)
 					{
+						density = density / (1 - _CutOff);
+
 						//Calculate cloud density
 						alphaVal += _DensityStepSize * _Density * density;
 
@@ -222,8 +230,12 @@
 
 				if (distInsideBox > 0 && distToBox < linearDepth)
 				{
+					float dist01 = 1 - clamp(distToBox - _FadeStartDist, 0, _FadeDist) / _FadeDist;
+
 					//3D tex
-					float4 sampleTexCol = raymarchClouds(_WorldSpaceCameraPos + normalize(i.viewDir) * distToBox, normalize(i.viewDir), distInsideBox); //raymarchSampleTex(_WorldSpaceCameraPos, i.viewDir, distToBox, distInsideBox);
+					float4 sampleTexCol = raymarchClouds(_WorldSpaceCameraPos + normalize(i.viewDir) * distToBox, normalize(i.viewDir), distInsideBox * dist01); //raymarchSampleTex(_WorldSpaceCameraPos, i.viewDir, distToBox, distInsideBox);
+					
+					sampleTexCol.a *= dist01;
 					col.rgb = lerp(col.rgb, sampleTexCol.rgb, sampleTexCol.a);
 
 
@@ -244,7 +256,6 @@
 						col = float4(colSample.rgb, 1);
 					}
 				}
-
                 return col;
             }
             ENDCG

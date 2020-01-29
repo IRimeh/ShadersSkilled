@@ -37,7 +37,7 @@ Material:
     - _NormalImpact: 10
     - _Stretch: 50
     - _Time: 1
-    - _TimeScale: 0
+    - _TimeScale: 0.73
     - _TriDistance: 0.1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

@@ -35,8 +35,6 @@
 			#pragma vertex vert
 			#pragma geometry geom
 			#pragma fragment frag
-			// make fog work
-			#pragma multi_compile_fog
 
 			#include "UnityCG.cginc"
 
@@ -133,12 +131,10 @@
 			fixed4 frag(g2f i) : SV_Target
 			{
 				float3 shadowCol = float3(0, 0, 0);
-				float lightVal = dot(i.lightDir, i.normal);
+				float lightVal = min(dot(i.lightDir, mul(unity_ObjectToWorld, float4(i.normal, 0.0f))), -10);
 
 				// sample the texture
 				fixed4 col = float4(lerp(lerp(tex2D(_MainTex, i.uv).rgb * _Color.rgb, i.col.rgb, 1 - i.mixVal), shadowCol, lightVal * i.mixVal), i.col.a);
-				// apply fog
-				UNITY_APPLY_FOG(i.fogCoord, col);
 				return col;
 			}
 			ENDCG

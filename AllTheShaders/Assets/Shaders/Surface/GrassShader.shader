@@ -82,7 +82,6 @@
 			val *= IN.yVal * _WobbleAmount * 5;
 			float2 tempOffset = float2(-_WindDirection.y, _WindDirection.x) * val;
 			_WindDirection.xy += tempOffset.xy;
-			//wpos += float4(displacementOffset.x, 0, displacementOffset.y, 0);
 
 			//Set vertex displacement based on direction and wind strength
 			float2 windOffset = (normalize(_WindDirection.xy) * _WindStrength) * IN.yVal * _GrassHeight * _GrassMaxDisplacement;
@@ -94,16 +93,6 @@
 			return displacement;
 		}
 
-		float4 AvoidObjects(appdata_full v, Input IN)
-		{
-			//Save start position
-			float4 startVertexPos = v.vertex;
-			float4 startwpos = mul(unity_ObjectToWorld, v.vertex);
-			float4 wpos = startwpos;
-			
-			return float4(0, 0, 0, 0);
-		}
-
 		void vert(inout appdata_full v, out Input IN)
 		{
 			UNITY_INITIALIZE_OUTPUT(Input, IN);
@@ -113,7 +102,6 @@
 			IN.yVal = pow(IN.yVal, 2);
 			
 			v.vertex += WindDisplacement(v, IN);
-			v.vertex += AvoidObjects(v, IN);
 		}
 
         void surf (Input IN, inout SurfaceOutputStandard o)

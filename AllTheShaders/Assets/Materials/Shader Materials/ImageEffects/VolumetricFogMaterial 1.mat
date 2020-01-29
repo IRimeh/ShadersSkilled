@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: VolumetricFogMaterial 1
+  m_Shader: {fileID: 4800000, guid: 91752a773b183b849aba81df9fe85306, type: 3}
+  m_ShaderKeywords: _USE3DFOGTEXTURE_ON
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _CookieTextures:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FogVolume:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TempCookieTex:
+        m_Texture: {fileID: 2800000, guid: e160013016c14fe43b513698cae9a3c6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _Channel0: 1
+    - _Channel1: 1
+    - _Channel2: 0.71
+    - _CutOff: 0.99
+    - _DetailMovementSpeed: 2
+    - _DetailWeight: 0
+    - _FogDensity: 0.0125
+    - _MaxSteps: 256
+    - _MovementSpeed: 0.3
+    - _SingleFogColor: 0
+    - _StepSize: 0.27
+    - _Tiling: 0.01
+    - _Use3DFogTexture: 1
+    m_Colors:
+    - _Channel0Tiling: {r: 0.01, g: 0.01, b: 0.01, a: 0.01}
+    - _Channel1Tiling: {r: 0.01, g: 0.01, b: 0.01, a: 0.01}
+    - _Channel2Tiling: {r: 0.01, g: 0.01, b: 0.01, a: 0.01}
+    - _DetailTiling: {r: 0.01, g: 0.01, b: 0.01, a: 0.01}
+    - _FogColor: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
+    - _MovementDirection: {r: 0, g: 1, b: 0, a: 0}
+    - _Tiling: {r: 0.01, g: 0.01, b: 0.01, a: 0.01}

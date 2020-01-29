@@ -30,6 +30,8 @@ public class VolumetricFogScript : MonoBehaviour
     private Vector3Int _dispatchGroupSize = new Vector3Int(1, 1, 1);
     [SerializeField]
     private bool _generateTexture;
+    [SerializeField]
+    private bool _generateOnStart = false;
 
     private Vector3 boundsMin;
     private Vector3 boundsMax;
@@ -157,6 +159,13 @@ public class VolumetricFogScript : MonoBehaviour
             pointLightRangeIntensity.Add(vec);
         }
     }
+    private void Start()
+    {
+        if (_generateOnStart)
+        {
+            Generate();
+        }
+    }
 
     private void Update()
     {
@@ -168,49 +177,54 @@ public class VolumetricFogScript : MonoBehaviour
         FindLights();
         if (_generateTexture)
         {
-            DateTime startTime = DateTime.Now;
-            Debug.Log("Starting time: " + startTime.TimeOfDay);
-
             _generateTexture = false;
-
-            int mainKernel = _computeShader.FindKernel("CSMain");
-            int pointGenerationKernel = _computeShader.FindKernel("PointGenerator");
-
-            //Create rendertexture
-            _renderTex = new RenderTexture(_textureSize, _textureSize, 0);
-            _renderTex.enableRandomWrite = true;
-            _renderTex.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
-            _renderTex.volumeDepth = _textureSize;
-            _renderTex.wrapMode = TextureWrapMode.Repeat;
-            _renderTex.Create();
-
-            //Channel 0 (Red)
-            _points = new Vector3[_channel0GridSize * _channel0GridSize * _channel0GridSize];
-            _newPoints = new Vector3[_channel0GridSize * _channel0GridSize * _channel0GridSize];
-            GeneratePoints(pointGenerationKernel, _textureSize, _channel0GridSize);
-            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel0GridSize, 0);
-            //Channel 1 (Green)
-            _points = new Vector3[_channel1GridSize * _channel1GridSize * _channel1GridSize];
-            _newPoints = new Vector3[_channel1GridSize * _channel1GridSize * _channel1GridSize];
-            GeneratePoints(pointGenerationKernel, _textureSize, _channel1GridSize);
-            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel1GridSize, 1);
-            //Channel 2 (Blue)
-            _points = new Vector3[_channel2GridSize * _channel2GridSize * _channel2GridSize];
-            _newPoints = new Vector3[_channel2GridSize * _channel2GridSize * _channel2GridSize];
-            GeneratePoints(pointGenerationKernel, _textureSize, _channel2GridSize);
-            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel2GridSize, 2);
-            //Channel 3 (Alpha)
-            _points = new Vector3[_channel3GridSize * _channel3GridSize * _channel3GridSize];
-            _newPoints = new Vector3[_channel3GridSize * _channel3GridSize * _channel3GridSize];
-            GeneratePoints(pointGenerationKernel, _textureSize, _channel3GridSize);
-            GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel3GridSize, 3);
-
-            DateTime endTime = DateTime.Now;
-            Debug.Log("End time: " + endTime.TimeOfDay);
-            Debug.Log("Time elapsed: " + (endTime - startTime).TotalSeconds + " seconds");
-
-            _volumetricFogMaterial.SetTexture("_FogVolume", _renderTex);
+            Generate();
         }
+    }
+
+    private void Generate()
+    {
+        DateTime startTime = DateTime.Now;
+        Debug.Log("Starting time: " + startTime.TimeOfDay);
+
+
+        int mainKernel = _computeShader.FindKernel("CSMain");
+        int pointGenerationKernel = _computeShader.FindKernel("PointGenerator");
+
+        //Create rendertexture
+        _renderTex = new RenderTexture(_textureSize, _textureSize, 0);
+        _renderTex.enableRandomWrite = true;
+        _renderTex.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
+        _renderTex.volumeDepth = _textureSize;
+        _renderTex.wrapMode = TextureWrapMode.Repeat;
+        _renderTex.Create();
+
+        //Channel 0 (Red)
+        _points = new Vector3[_channel0GridSize * _channel0GridSize * _channel0GridSize];
+        _newPoints = new Vector3[_channel0GridSize * _channel0GridSize * _channel0GridSize];
+        GeneratePoints(pointGenerationKernel, _textureSize, _channel0GridSize);
+        GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel0GridSize, 0);
+        //Channel 1 (Green)
+        _points = new Vector3[_channel1GridSize * _channel1GridSize * _channel1GridSize];
+        _newPoints = new Vector3[_channel1GridSize * _channel1GridSize * _channel1GridSize];
+        GeneratePoints(pointGenerationKernel, _textureSize, _channel1GridSize);
+        GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel1GridSize, 1);
+        //Channel 2 (Blue)
+        _points = new Vector3[_channel2GridSize * _channel2GridSize * _channel2GridSize];
+        _newPoints = new Vector3[_channel2GridSize * _channel2GridSize * _channel2GridSize];
+        GeneratePoints(pointGenerationKernel, _textureSize, _channel2GridSize);
+        GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel2GridSize, 2);
+        //Channel 3 (Alpha)
+        _points = new Vector3[_channel3GridSize * _channel3GridSize * _channel3GridSize];
+        _newPoints = new Vector3[_channel3GridSize * _channel3GridSize * _channel3GridSize];
+        GeneratePoints(pointGenerationKernel, _textureSize, _channel3GridSize);
+        GenerateWorleyNoise(mainKernel, _renderTex, _textureSize, _channel3GridSize, 3);
+
+        DateTime endTime = DateTime.Now;
+        Debug.Log("End time: " + endTime.TimeOfDay);
+        Debug.Log("Time elapsed: " + (endTime - startTime).TotalSeconds + " seconds");
+
+        _volumetricFogMaterial.SetTexture("_FogVolume", _renderTex);
     }
 
     private void GeneratePoints(int kernel, int textureSize, int gridSize)

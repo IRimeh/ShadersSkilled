@@ -49,10 +49,11 @@ Material:
     - _NoiseDepth: 1
     - _NoiseTiling: 0.5
     - _SecondNoiseDepth: 0.2
-    - _SecondNoiseTiling: 2.41
+    - _SecondNoiseTiling: 2
     - _SparkleCutoff: 1
     - _SparkleTiling: 0.08
     - _Tess: 64
+    - _VectorLength: 0.5
     m_Colors:
-    - _Color: {r: 0.7783019, g: 0.89428526, b: 1, a: 1}
-    - _TrampledSnowColor: {r: 0.5752492, g: 0.6301782, b: 0.8773585, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _TrampledSnowColor: {r: 0.86743504, g: 0.8820147, b: 0.9528302, a: 1}

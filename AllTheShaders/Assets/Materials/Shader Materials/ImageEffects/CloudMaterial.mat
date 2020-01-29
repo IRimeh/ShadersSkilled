@@ -35,15 +35,17 @@ Material:
     - _Channel0: 1
     - _Channel1: 0.32
     - _Channel2: 0.28
-    - _CutOff: 0.335
+    - _CutOff: 0.07
     - _Debug: 0
-    - _Density: 1
+    - _Density: 0.09
     - _DensityStepNum: 100
     - _DensityStepSize: 0.2
     - _DetailMovementSpeed: 0
     - _DetailWeight: 0.02
+    - _FadeDist: 100
+    - _FadeStartDist: 100
     - _LightStepNum: 12
-    - _LightStepSize: 0.25
+    - _LightStepSize: 0.5
     - _MovementSpeed: 0.05
     - _Samples: 1
     - _StepLimit: 10

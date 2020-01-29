@@ -9,7 +9,7 @@
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags { "RenderType"="Opaque" "ForceNoShadowCasting" = "True"}
         LOD 200
 		Cull Front
 		ZTest Always

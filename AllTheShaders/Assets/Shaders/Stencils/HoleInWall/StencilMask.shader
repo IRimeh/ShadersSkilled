@@ -2,7 +2,6 @@
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
     }
     SubShader
     {
@@ -13,128 +12,59 @@
 		Stencil
 		{
 			Ref 1
-			Comp always
 			Pass replace
 		}
 
-       /* Pass
-        {*/
-            CGPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #pragma multi_compile_fog
+		Pass
+		{
+			Cull Front
+			ZTest Less
 
-            #include "UnityCG.cginc"
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
+			struct appdata { float4 vertex : POSITION; };
+			struct v2f { float4 vertex : SV_POSITION; };
 
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
-
-            sampler2D _MainTex;
-            float4 _MainTex_ST;
-
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                return o;
-            }
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				return o;
+			}
 
 			fixed4 frag(v2f i) : SV_Target
 			{
-				// sample the texture
-				fixed4 col = tex2D(_MainTex, i.uv);
-				return col;
+				return float4(1,1,1,1);
 			}
 			ENDCG
+		}
 
-			Pass
+		Pass
+		{
+			Cull Back
+			ZTest Greater
+
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+
+			struct appdata { float4 vertex : POSITION; };
+			struct v2f { float4 vertex : SV_POSITION; };
+
+			v2f vert(appdata v)
 			{
-				Cull Front
-				ZTest Less
-
-				CGPROGRAM
-				#pragma vertex vert
-				#pragma fragment frag
-
-					struct appdata
-				{
-					float4 vertex : POSITION;
-					float2 uv : TEXCOORD0;
-				};
-
-				struct v2f
-				{
-					float2 uv : TEXCOORD0;
-					float4 vertex : SV_POSITION;
-				};
-
-				sampler2D _MainTex;
-				float4 _MainTex_ST;
-
-				v2f vert(appdata v)
-				{
-					v2f o;
-					o.vertex = UnityObjectToClipPos(v.vertex);
-					o.uv = v.uv;// TRANSFORM_TEX(v.uv, _MainTex);
-					return o;
-				}
-
-				fixed4 frag(v2f i) : SV_Target
-				{
-					// sample the texture
-					fixed4 col = tex2D(_MainTex, i.uv);
-					return col;
-				}
-				ENDCG
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				return o;
 			}
-			Pass
+
+			fixed4 frag(v2f i) : SV_Target
 			{
-				Cull Back
-				ZTest Greater
-
-				CGPROGRAM
-				#pragma vertex vert
-				#pragma fragment frag
-					struct appdata
-				{
-					float4 vertex : POSITION;
-					float2 uv : TEXCOORD0;
-				};
-
-				struct v2f
-				{
-					float2 uv : TEXCOORD0;
-					float4 vertex : SV_POSITION;
-				};
-
-				sampler2D _MainTex;
-				float4 _MainTex_ST;
-
-				v2f vert(appdata v)
-				{
-					v2f o;
-					o.vertex = UnityObjectToClipPos(v.vertex);
-					o.uv = v.uv;// TRANSFORM_TEX(v.uv, _MainTex);
-					return o;
-				}
-
-				fixed4 frag(v2f i) : SV_Target
-				{
-					// sample the texture
-					fixed4 col = tex2D(_MainTex, i.uv);
-					return col;
-				}
-				ENDCG
+				return float4(1,1,1,1);
 			}
+			ENDCG
+		}
     }
 }

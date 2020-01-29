@@ -373,7 +373,7 @@ Shader "Unlit/VoxelisationShader"
 				float3 col = lerp(_CubeColor, tex2D(_MainTex, i.uv).rgb * _Color.rgb, max(i.textureFrag, _UseTextureColor));
 
 				//Return
-				fixed4 returnVal = float4(col * lightVal * shadow, i.alpha);
+				fixed4 returnVal = float4(col * max(lightVal * shadow, 0.1), i.alpha);
 				return returnVal;
 			}
 			ENDCG

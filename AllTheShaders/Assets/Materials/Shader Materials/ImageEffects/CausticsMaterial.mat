@@ -24,20 +24,21 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex:
-        m_Texture: {fileID: 8400000, guid: 96ab78cadade39945a45fa2a705dc494, type: 2}
+        m_Texture: {fileID: 2800000, guid: bfb3ae906abf1764f992f889f51d800d, type: 3}
         m_Scale: {x: 0.05, y: 0.05}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex2:
-        m_Texture: {fileID: 8400000, guid: 96ab78cadade39945a45fa2a705dc494, type: 2}
+        m_Texture: {fileID: 2800000, guid: bfb3ae906abf1764f992f889f51d800d, type: 3}
         m_Scale: {x: 0.05, y: 0.05}
         m_Offset: {x: 0, y: 0}
     - _NoiseTex3:
-        m_Texture: {fileID: 8400000, guid: 96ab78cadade39945a45fa2a705dc494, type: 2}
+        m_Texture: {fileID: 2800000, guid: bfb3ae906abf1764f992f889f51d800d, type: 3}
         m_Scale: {x: 0.25, y: 0.25}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _CausticsFallOffDist: 80
-    - _CausticsStrength: 1.53
+    - _CausticAmount: 0.925
+    - _CausticsFallOffDist: 5
+    - _CausticsStrength: 1.79
     - _RefractionStrength: 0.5
     - _VectorLength: 0.391
     - _Wave1Speed: 20
@@ -45,10 +46,10 @@ Material:
     - _Wave2Speed: 10
     - _Wave2Weight: 1
     - _Wave3Speed: 5
-    - _Wave3Weight: 0.15
+    - _Wave3Weight: 0.166
     - _WaveHeight: 0.5
     m_Colors:
-    - _CausticsColor: {r: 0.7322891, g: 0.8186711, b: 0.8301887, a: 1}
+    - _CausticsColor: {r: 0.34718758, g: 0.7693813, b: 0.8867924, a: 1}
     - _Wave1Direction: {r: 1, g: 0.5, b: 1, a: 1}
     - _Wave2Direction: {r: 1, g: 0, b: 1, a: 1}
     - _Wave3Direction: {r: 1, g: 1, b: 1, a: 1}

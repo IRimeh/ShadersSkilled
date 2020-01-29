@@ -49,6 +49,12 @@ public class ScanEffect : MonoBehaviour
         _camera.depthTextureMode = DepthTextureMode.Depth;
     }
 
+    private void Start()
+    {
+        if (scanner)
+            scanMaterial.SetVector("_WorldSpaceScannerPos", scanner.transform.position);
+    }
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.F))
